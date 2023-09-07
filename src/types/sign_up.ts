@@ -5,4 +5,8 @@ export interface signUpUserType {
   email?: string;
 }
 
-export type errorHandlerFuncType = (err: Error | string) => void;
+export interface loginErrorType {
+  username?: string;
+  password?: string;
+  connection?: string;
+}

@@ -1,10 +1,11 @@
 import { Route } from "react-router-dom";
 
-import { signUpUserType, errorHandlerFuncType } from "../../types/auth/sign_up";
+import { signUpUserType, loginErrorType } from "../../types/sign_up";
 
 import Auth from "./auth";
 import Login from "./login";
 import SignUp from "./sign_up";
+import { date } from "zod";
 
 export default function AuthRoutes() {
   const signUp = (
@@ -12,32 +13,45 @@ export default function AuthRoutes() {
     errorHandler: errorHandlerFuncType
   ) => {
     // API call to sign up user return JWT token and log in
-    if (signUpUser.username === "error") {
-      return errorHandler(new Error("test error"));
-    } else {
-      return;
+    try {
+      if (signUpUser.username === "error") {
+        throw new Error("something went wrong");
+      } else {
+        console.log(signUpUser);
+      }
+    } catch (err) {
+      if (typeof err === "string") {
+        errorHandler([{ connection: err }]);
+      } else if (err instanceof Error) {
+        errorHandler([{ connection: err.message }]);
+      }
     }
   };
-  const login = (
-    username: string,
-    password: string,
-    errorHandler: errorHandlerFuncType
-  ): void | Error => {
+  const login = async (user: {
+    username: string;
+    password: string;
+  }): Promise<void | loginErrorType[]> => {
     // API call to log in JWT token added to local storage
-    if (username === "error") {
-      return errorHandler(new Error("test error"));
-    } else {
-      localStorage.setItem("user", username);
-      localStorage.setItem("password", password);
-      return;
+    try {
+      if (user.username === "error") {
+        throw new Error("something went wrong");
+      } else {
+        console.log(user);
+      }
+    } catch (err) {
+      if (typeof err === "string") {
+        return [{ connection: err }];
+      } else if (err instanceof Error) {
+        return [{ connection: err.message }];
+      }
     }
   };
 
   return (
     <>
-      <Route index element={<Auth />} login={login} />
+      <Route index element={<Auth />} />
       <Route path="login" element={<Login login={login} />} />
-      <Route path="sign-up" element={<SignUp signUp={signUp} />} />
+      <Route path="sign-up" element={<SignUp />} />
     </>
   );
 }
