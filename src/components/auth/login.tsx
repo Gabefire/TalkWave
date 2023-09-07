@@ -31,15 +31,16 @@ const Login = ({ login }: loginType) => {
   const onSubmit: SubmitHandler<loginFormSchemaType> = async (user) => {
     const results = await login(user);
     if (results instanceof Array) {
-      results.forEach(() => {
-        const key = Object.keys(user)[0];
-        const value = Object.values(user)[0];
+      results.forEach((obj) => {
+        const key = Object.keys(obj)[0];
+        const value = Object.values(obj)[0];
+        console.log(key, value);
         if (key === "username") {
-          setError("username", { type: "manual", message: value });
+          setError("username", { type: "manual", message: `${value}` });
         } else if (key === "password") {
-          setError("password", { type: "manual", message: value });
-        } else {
-          setError("root", { type: "manual", message: value });
+          setError("password", { type: "manual", message: `${value}` });
+        } else if (key === "serverError") {
+          setError("root.serverError", { type: "404", message: `${value}` });
         }
       });
       return;
@@ -84,7 +85,9 @@ const Login = ({ login }: loginType) => {
           </span>
         )}
       </label>
-      <div className="errors">{errors.root?.message}</div>
+      {errors.root && (
+        <div className="errors">{errors.root?.serverError.message}</div>
+      )}
       <button
         type="submit"
         disabled={isSubmitting}
