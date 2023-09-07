@@ -8,5 +8,5 @@ export interface signUpUserType {
 export interface loginErrorType {
   username?: string;
   password?: string;
-  connection?: string;
+  root?: string;
 }

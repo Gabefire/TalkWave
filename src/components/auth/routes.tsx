@@ -40,9 +40,9 @@ export default function AuthRoutes() {
       }
     } catch (err) {
       if (typeof err === "string") {
-        return [{ connection: err }];
+        return [{ root: err }];
       } else if (err instanceof Error) {
-        return [{ connection: err.message }];
+        return [{ root: err.message }];
       }
     }
   };

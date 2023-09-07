@@ -8,7 +8,7 @@ interface loginType {
   login: (user: {
     username: string;
     password: string;
-  }) => Promise<void | loginErrorType>;
+  }) => Promise<void | loginErrorType[]>;
 }
 
 const loginFormSchema = z.object({
@@ -22,6 +22,7 @@ const Login = ({ login }: loginType) => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<loginFormSchemaType>({ resolver: zodResolver(loginFormSchema) });
 
@@ -30,6 +31,17 @@ const Login = ({ login }: loginType) => {
   const onSubmit: SubmitHandler<loginFormSchemaType> = async (user) => {
     const results = await login(user);
     if (results instanceof Array) {
+      results.forEach(() => {
+        const key = Object.keys(user)[0];
+        const value = Object.values(user)[0];
+        if (key === "username") {
+          setError("username", { type: "manual", message: value });
+        } else if (key === "password") {
+          setError("password", { type: "manual", message: value });
+        } else {
+          setError("root", { type: "manual", message: value });
+        }
+      });
       return;
     } else {
       navigate("/main");
@@ -72,7 +84,7 @@ const Login = ({ login }: loginType) => {
           </span>
         )}
       </label>
-      <div className="errors"></div>
+      <div className="errors">{errors.root?.message}</div>
       <button
         type="submit"
         disabled={isSubmitting}
