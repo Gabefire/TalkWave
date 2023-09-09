@@ -10,3 +10,11 @@ export interface loginErrorType {
   password?: string;
   root?: string;
 }
+
+export interface signUpErrorType {
+  username?: string;
+  password?: string;
+  confirmPassword?: string;
+  email?: string;
+  root?: string;
+}

@@ -21,7 +21,7 @@ describe("login component", () => {
     expect(header).toBeInTheDocument();
   });
 
-  it("should call click function on login with fields filled out", async () => {
+  it("should call login function with fields filled out", async () => {
     const login = vi.fn();
     const user = userEvent.setup();
 

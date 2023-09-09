@@ -1,4 +1,4 @@
-import { signUpUserType, loginErrorType } from "../../types/sign_up";
+import { signUpUserType, loginErrorType } from "../../types/auth";
 
 export const signUp = (signUpUser: signUpUserType) => {
   // API call to sign up user return JWT token and log in
