@@ -34,7 +34,6 @@ const Login = ({ login }: loginType) => {
       results.forEach((obj) => {
         const key = Object.keys(obj)[0];
         const value = Object.values(obj)[0];
-        console.log(key, value);
         if (key === "username") {
           setError("username", { type: "manual", message: `${value}` });
         } else if (key === "password") {
@@ -45,7 +44,7 @@ const Login = ({ login }: loginType) => {
       });
       return;
     } else {
-      navigate("/main");
+      navigate("/");
     }
   };
   return (

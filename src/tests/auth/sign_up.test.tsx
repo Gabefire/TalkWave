@@ -11,12 +11,11 @@ vi.mock("react-router-dom", () => ({
   ...vi.importActual("react-router-dom"),
   useNavigate: () => mockUsedNavigate,
 }));
-const login = vi.fn();
-
-const signUp = vi.fn();
 
 describe("sign up component", () => {
   it("renders correct heading", () => {
+    const login = vi.fn();
+    const signUp = vi.fn();
     render(<SignUp login={login} signUp={signUp} />);
 
     const header = screen.getByRole("heading", { name: "Sign Up" });
@@ -24,31 +23,9 @@ describe("sign up component", () => {
     expect(header).toBeInTheDocument();
   });
 
-  it("should call sign up function and login with fields filled out", async () => {
-    const user = userEvent.setup();
-
-    render(<SignUp login={login} signUp={signUp} />);
-
-    const username = screen.getByRole("textbox", {
-      name: "username",
-    });
-    const password = screen.getByLabelText(/Password:/i);
-    const passwordConfirmation = screen.getByLabelText(
-      /Password Confirmation/i
-    );
-
-    const button = screen.getByRole("button", { name: "Sign Up" });
-
-    await user.type(username, "test");
-    await user.type(password, "test");
-    await user.type(passwordConfirmation, "test");
-    await user.click(button);
-
-    expect(signUp).toBeCalled();
-    expect(login).toBeCalled();
-  });
-
   it("when fields are empty sign up should not run and errors should display", async () => {
+    const signUp = vi.fn();
+    const login = vi.fn();
     const user = userEvent.setup();
 
     render(<SignUp login={login} signUp={signUp} />);
@@ -66,7 +43,32 @@ describe("sign up component", () => {
     ).toBeVisible();
   });
 
+  it("should call sign up function and login with fields filled out", async () => {
+    const login = vi.fn();
+    const signUp = vi.fn();
+    const user = userEvent.setup();
+
+    render(<SignUp login={login} signUp={signUp} />);
+
+    const username = screen.getByRole("textbox", {
+      name: "username",
+    });
+    const password = screen.getByLabelText(/^Password:/i);
+    const passwordConfirmation = screen.getByLabelText(/Confirm Password:/i);
+
+    const button = screen.getByRole("button", { name: "Sign Up" });
+
+    await user.type(username, "test");
+    await user.type(password, "test");
+    await user.type(passwordConfirmation, "test");
+    await user.click(button);
+
+    expect(signUp).toBeCalled();
+    expect(login).toBeCalled();
+  });
+
   it("error should show if login api fails", async () => {
+    const signUp = vi.fn();
     const login = vi.fn().mockImplementation(() => {
       return [{ serverError: "test error" }];
     });
@@ -77,10 +79,8 @@ describe("sign up component", () => {
     const username = screen.getByRole("textbox", {
       name: "username",
     });
-    const password = screen.getByLabelText(/Password:/i);
-    const passwordConfirmation = screen.getByLabelText(
-      /Password Confirmation/i
-    );
+    const password = screen.getByLabelText(/^Password:/i);
+    const passwordConfirmation = screen.getByLabelText(/Confirm Password:/i);
 
     const button = screen.getByRole("button", { name: "Sign Up" });
 
@@ -94,6 +94,7 @@ describe("sign up component", () => {
   });
 
   it("error should show if sign up api fails", async () => {
+    const login = vi.fn();
     const signUp = vi.fn().mockImplementation(() => {
       return [{ serverError: "test error" }];
     });
@@ -104,10 +105,8 @@ describe("sign up component", () => {
     const username = screen.getByRole("textbox", {
       name: "username",
     });
-    const password = screen.getByLabelText(/Password:/i);
-    const passwordConfirmation = screen.getByLabelText(
-      /Password Confirmation/i
-    );
+    const password = screen.getByLabelText(/^Password:/i);
+    const passwordConfirmation = screen.getByLabelText(/Confirm Password:/i);
 
     const button = screen.getByRole("button", { name: "Sign Up" });
 
@@ -116,7 +115,7 @@ describe("sign up component", () => {
     await user.type(passwordConfirmation, "test");
     await user.click(button);
 
-    expect(login).toBeCalled();
+    expect(login).not.toBeCalled();
     expect(await screen.findByText(/test error/i)).toBeVisible();
   });
 });
