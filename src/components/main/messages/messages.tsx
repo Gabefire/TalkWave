@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
-import { messageType } from "../../types/messages";
+import { useContext, useEffect, useState } from "react";
+import { messageType } from "../../../types/messages";
+import { MessageQueryContext } from "../App";
 
-interface messagesQueryType {
-  messagesQuery: { name: string; type: "group" | "user" };
-}
+function Messages() {
+  const messageQuery = useContext(MessageQueryContext);
 
-function Messages({ messagesQuery }: messagesQueryType) {
   const [messageArray, setMessageArray] = useState([] as messageType[]);
+
   useEffect(() => {
     const fetchMessageInfo = async () => {
       try {
         //fetch messages call
-        console.log(messagesQuery);
+        console.log(messageQuery);
         const results: messageType[] = [
           {
             from: "gabe",
@@ -36,7 +36,7 @@ function Messages({ messagesQuery }: messagesQueryType) {
       }
     };
     fetchMessageInfo();
-  }, [messagesQuery]);
+  }, [messageQuery]);
 
   return (
     <>

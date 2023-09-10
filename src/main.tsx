@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import App from "./App.tsx";
+import App from "./components/main/App.tsx";
 import "./index.css";
 import MainPage from "./components/auth/main_page.tsx";
 import Login from "./components/auth/login.tsx";
