@@ -31,7 +31,7 @@ const signUpFormSchema = z
     message: "Passwords do not match",
   });
 
-type signUpFormSchemaType = z.infer<typeof signUpFormSchema>;
+export type signUpFormSchemaType = z.infer<typeof signUpFormSchema>;
 
 const SignUp = ({ signUp, login }: signUpType) => {
   const {

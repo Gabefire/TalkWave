@@ -3,25 +3,25 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
-import Auth from "./components/auth/auth.tsx";
+import MainPage from "./components/auth/main_page.tsx";
 import Login from "./components/auth/login.tsx";
 import SignUp from "./components/auth/sign_up.tsx";
 
-import { login } from "./components/auth/auth_util.ts";
+import { login, signUp } from "./components/auth/auth_util.ts";
 import AuthRoot from "./components/auth/auth_root.tsx";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/main",
     element: <App />,
   },
   {
-    path: "auth",
+    path: "/",
     element: <AuthRoot />,
     children: [
-      { index: true, element: <Auth /> },
+      { index: true, element: <MainPage login={login} /> },
       { path: "login", element: <Login login={login} /> },
-      { path: "sign-up", element: <SignUp /> },
+      { path: "sign-up", element: <SignUp login={login} signUp={signUp} /> },
     ],
   },
 ]);
