@@ -1,7 +1,16 @@
+import { useState } from "react";
 import "./App.css";
 
 function App() {
-  return <div>Home</div>;
+  const [messageQuery, setMessageQuery] = useState({})
+  const setMessageQuery = () => 
+  return (
+    <>
+      <Header />
+      <SideBar />
+      <Messages />
+    </>
+  );
 }
 
 export default App;
