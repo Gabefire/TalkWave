@@ -1,4 +1,4 @@
-import { messageQueryType } from "../../../types/messages";
+import { messageQueryType } from "../../types/messages";
 
 interface sideBarType {
   updateMessageQuery: (data: messageQueryType) => void;

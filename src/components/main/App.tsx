@@ -1,34 +1,25 @@
-import { createContext, useEffect, useState } from "react";
-import "./App.css";
+import { createContext, useState } from "react";
+import "../../App.css";
 import { messageQueryType } from "../../types/messages";
 
-import Header from "./header/header";
-import SideBar from "./side_bar/side_bar";
-import Messages from "./messages/messages";
+import Header from "./header";
+import SideBar from "./side_bar";
+import Messages from "./messages";
 
 export const MessageQueryContext = createContext({
-  messageQuery: { name: "", type: null as string | null } as messageQueryType,
-  user: { username: "" },
-});
+  name: "",
+  type: null as string | null,
+} as messageQueryType);
 
 function App() {
   const [messageQuery, setMessageQuery] = useState({} as messageQueryType);
-  const [user, setUser] = useState({} as { username: string });
-
-  useEffect(() => {
-    // get user inform with JWT
-    const user = {
-      username: "gabe",
-    };
-    setUser(user);
-  }, []);
 
   const updateMessageQuery = (data: messageQueryType): void => {
     setMessageQuery(data);
   };
 
   return (
-    <MessageQueryContext.Provider value={{ messageQuery, user }}>
+    <MessageQueryContext.Provider value={messageQuery}>
       <Header />
       <SideBar updateMessageQuery={updateMessageQuery} />
       <Messages />
