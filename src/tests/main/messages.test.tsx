@@ -42,7 +42,7 @@ describe("message component", () => {
     await user.type(message, "Hi how are you");
     await user.click(button);
 
-    expect(screen.getByText(/^His how are you/)).toBeInTheDocument();
+    expect(screen.getByText(/^Hi how are you/)).toBeInTheDocument();
   });
 
   test("deletes group when delete button is hit", async () => {

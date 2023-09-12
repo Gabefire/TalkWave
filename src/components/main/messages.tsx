@@ -1,10 +1,28 @@
-import React, { useContext, useEffect, useState } from "react";
-import { messageResultType } from "../../types/messages";
+import { useContext, useEffect, useState } from "react";
+import { messageResultType, messageType } from "../../types/messages";
 import { MessageQueryContext } from "./App";
+
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 import MessageBody from "./message_body";
 
+const sendMessageFormSchema = z.object({
+  message: z.string().min(1),
+});
+
+type sendMessageFormSchemaType = z.infer<typeof sendMessageFormSchema>;
+
 function Messages() {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<sendMessageFormSchemaType>({
+    resolver: zodResolver(sendMessageFormSchema),
+  });
+
   const messageQuery = useContext(MessageQueryContext);
 
   const [messageResults, setMessageResults] = useState({} as messageResultType);
@@ -12,6 +30,7 @@ function Messages() {
 
   useEffect(() => {
     const fetchMessageInfo = async () => {
+      console.log("test");
       try {
         //fetch messages call
         const results: messageResultType = {
@@ -52,13 +71,62 @@ function Messages() {
     fetchMessageInfo();
   }, [messageQuery]);
 
+  const postMessage = async (message: string): Promise<void | messageType> => {
+    // API call to post message
+    try {
+      console.log(message);
+      return {
+        from: "gabe",
+        content: message,
+        date: new Date(),
+        owner: false,
+      };
+    } catch (error) {
+      // toDO better error handler
+      console.error(error);
+    }
+  };
+
+  const onSubmit: SubmitHandler<sendMessageFormSchemaType> = async ({
+    message,
+  }) => {
+    // POST message add message to array if success
+    const results = await postMessage(message);
+    if (results) {
+      setMessageResults((prev) => {
+        return {
+          ...prev,
+          messages: [...prev.messages, results],
+        };
+      });
+    }
+  };
+
   return (
     <div className="messages">
-      {isLoading ? (
-        <div>No Messages Found</div>
-      ) : (
-        <MessageBody messageResults={messageResults} />
-      )}
+      <div className="message-body">
+        {isLoading ? (
+          <div>No Messages Found</div>
+        ) : (
+          <MessageBody messageResults={messageResults} />
+        )}
+      </div>
+      <form className="send-message" onSubmit={handleSubmit(onSubmit)}>
+        <input
+          aria-label="message"
+          type="text"
+          className="message-input"
+          id="message-input"
+          {...register("message")}
+        />
+        <button
+          type="submit"
+          className="submit-message-btn"
+          disabled={isSubmitting}
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
 }
