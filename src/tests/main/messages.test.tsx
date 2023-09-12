@@ -34,7 +34,7 @@ describe("message component", () => {
 
   test("adding message includes div in documents", async () => {
     const user = userEvent.setup();
-    customRender(<Messages />, { type: "group", name: "gabe" }).debug();
+    customRender(<Messages />, { type: "group", name: "gabe" });
 
     const message = screen.getByRole("textbox", { name: "message" });
     const button = screen.getByRole("button", { name: "Send" });

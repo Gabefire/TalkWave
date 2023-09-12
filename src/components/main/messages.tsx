@@ -1,18 +1,19 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { messageResultType } from "../../types/messages";
 import { MessageQueryContext } from "./App";
+
+import MessageBody from "./message_body";
 
 function Messages() {
   const messageQuery = useContext(MessageQueryContext);
 
   const [messageResults, setMessageResults] = useState({} as messageResultType);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMessageInfo = () => {
-      console.log("test");
+    const fetchMessageInfo = async () => {
       try {
         //fetch messages call
-        console.log(messageQuery);
         const results: messageResultType = {
           title: "gabe",
           type: "group",
@@ -39,46 +40,25 @@ function Messages() {
           ],
         };
         setMessageResults(results);
+        setIsLoading(false);
       } catch (error) {
         // to do better error handler probably to a different page
         console.error(error);
       }
     };
+    if (!messageQuery.type) {
+      return;
+    }
     fetchMessageInfo();
   }, [messageQuery]);
 
   return (
     <div className="messages">
-      <div className="topBar">
-        {messageResults.owner ? (
-          <button className="message-header-btn delete">Delete</button>
-        ) : (
-          <button className="message-header-btn leave">Leave</button>
-        )}
-        <h1>{messageResults.title}</h1>
-      </div>
-      <div className="main-message-content">
-        {messageResults.messages.map((post, index) => {
-          return (
-            <div
-              className="message"
-              style={
-                post.owner ? { marginLeft: "auto" } : { marginRight: "auto" }
-              }
-              key={`message-${index}`}
-            >
-              {/* toDo add better date */}
-              <h5
-                className="message-header"
-                style={
-                  post.owner ? { marginRight: "auto" } : { marginLeft: "auto" }
-                }
-              >{`${post.from} ${post.date}`}</h5>
-              <p>{post.content}</p>
-            </div>
-          );
-        })}
-      </div>
+      {isLoading ? (
+        <div>No Messages Found</div>
+      ) : (
+        <MessageBody messageResults={messageResults} />
+      )}
     </div>
   );
 }
