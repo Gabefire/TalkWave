@@ -13,10 +13,10 @@ function SideBar({ updateMessageQuery }: sideBarType) {
     updateMessageQuery(data);
   };
   return (
-    <>
+    <div className="side-bar">
       <div>Sidebar</div>
       <button onClick={onClick}></button>
-    </>
+    </div>
   );
 }
 

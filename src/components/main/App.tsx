@@ -1,5 +1,5 @@
-import { createContext, useEffect, useState } from "react";
-import "../../App.css";
+import { createContext, useState } from "react";
+import "./App.css";
 import { messageQueryType } from "../../types/messages";
 
 import Header from "./header";
@@ -20,9 +20,13 @@ function App() {
 
   return (
     <MessageQueryContext.Provider value={messageQuery}>
-      <Header />
-      <SideBar updateMessageQuery={updateMessageQuery} />
-      <Messages />
+      <div className="app">
+        <Header />
+        <div className="body">
+          <Messages />
+        </div>
+        <SideBar updateMessageQuery={updateMessageQuery} />
+      </div>
     </MessageQueryContext.Provider>
   );
 }

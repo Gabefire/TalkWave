@@ -79,7 +79,7 @@ function Messages() {
         from: "gabe",
         content: message,
         date: new Date(),
-        owner: false,
+        owner: true,
       };
     } catch (error) {
       // toDO better error handler
@@ -103,7 +103,7 @@ function Messages() {
   };
 
   return (
-    <div className="messages">
+    <>
       <div className="message-body">
         {isLoading ? (
           <div>No Messages Found</div>
@@ -112,9 +112,10 @@ function Messages() {
         )}
       </div>
       <form className="send-message" onSubmit={handleSubmit(onSubmit)}>
-        <input
+        <textarea
           aria-label="message"
-          type="text"
+          rows={4}
+          cols={50}
           className="message-input"
           id="message-input"
           {...register("message")}
@@ -127,7 +128,7 @@ function Messages() {
           Send
         </button>
       </form>
-    </div>
+    </>
   );
 }
 
