@@ -8,6 +8,8 @@ import { z } from "zod";
 
 import MessageBody from "./message_body";
 
+import "./messages.css";
+
 const sendMessageFormSchema = z.object({
   message: z.string().min(1),
 });

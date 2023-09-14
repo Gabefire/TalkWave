@@ -7,13 +7,13 @@ interface messageBodyType {
 export default function MessageBody({ messageResults }: messageBodyType) {
   return (
     <>
-      <div className="topBar">
+      <div className="messages-top-bar">
+        <h2>{messageResults.title}</h2>
         {messageResults.owner ? (
           <button className="message-header-btn delete">Delete</button>
         ) : (
           <button className="message-header-btn leave">Leave</button>
         )}
-        <h2>{messageResults.title}</h2>
       </div>
       <div className="main-message-content">
         {messageResults.messages.length === 0
@@ -26,9 +26,12 @@ export default function MessageBody({ messageResults }: messageBodyType) {
                     post.owner
                       ? {
                           textAlign: "end",
+                          alignSelf: "flex-end",
+                          backgroundColor: "gray",
                         }
                       : {
                           textAlign: "start",
+                          backgroundColor: "#007AFF",
                         }
                   }
                   key={`message-${index}`}
