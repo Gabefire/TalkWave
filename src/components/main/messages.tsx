@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import MessageBody from "./message_body";
+import { messageQueryType } from "../../types/messages";
 
 import "./messages.css";
 
@@ -16,7 +17,11 @@ const sendMessageFormSchema = z.object({
 
 type sendMessageFormSchemaType = z.infer<typeof sendMessageFormSchema>;
 
-function Messages() {
+interface messageCompType {
+  updateMessageQuery: (data: messageQueryType) => void;
+}
+
+function Messages({ updateMessageQuery }: messageCompType) {
   const {
     register,
     handleSubmit,
@@ -104,13 +109,25 @@ function Messages() {
     }
   };
 
+  // to do better no info comp
+  if (!messageQuery.name && !messageQuery.type) {
+    return (
+      <>
+        <div>No information</div>
+      </>
+    );
+  }
+
   return (
     <>
       <div className="message-body">
         {isLoading ? (
           <div>No Messages Found</div>
         ) : (
-          <MessageBody messageResults={messageResults} />
+          <MessageBody
+            messageResults={messageResults}
+            updateMessageQuery={updateMessageQuery}
+          />
         )}
       </div>
       <form className="send-message" onSubmit={handleSubmit(onSubmit)}>

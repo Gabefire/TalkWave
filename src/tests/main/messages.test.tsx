@@ -5,6 +5,7 @@ import { MessageQueryContext } from "../../components/main/App";
 import { ReactElement } from "react";
 import { messageQueryType } from "../../types/messages";
 import Messages from "../../components/main/messages";
+import { vi } from "vitest";
 
 const customRender = (
   ui: ReactElement,
@@ -21,12 +22,17 @@ const customRender = (
 
 describe("message component", () => {
   test("Messages show default text", () => {
-    render(<Messages />);
-    expect(screen.getByText(/^No Messages Found/)).toBeInTheDocument();
+    const updateMessageQuery = vi.fn();
+    render(<Messages updateMessageQuery={updateMessageQuery} />);
+    expect(screen.getByText(/No information/)).toBeInTheDocument();
   });
 
   test("displays messages and title", () => {
-    customRender(<Messages />, { type: "group", name: "gabe" });
+    const updateMessageQuery = vi.fn();
+    customRender(<Messages updateMessageQuery={updateMessageQuery} />, {
+      type: "group",
+      name: "gabe",
+    });
 
     expect(screen.getByRole("heading", { name: "gabe" })).toBeInTheDocument();
     expect(screen.getByText(/^Hi this is Leah/)).toBeInTheDocument();
@@ -34,7 +40,11 @@ describe("message component", () => {
 
   test("adding message includes div in documents", async () => {
     const user = userEvent.setup();
-    customRender(<Messages />, { type: "group", name: "gabe" });
+    const updateMessageQuery = vi.fn();
+    customRender(<Messages updateMessageQuery={updateMessageQuery} />, {
+      type: "group",
+      name: "gabe",
+    });
 
     const message = screen.getByRole("textbox", { name: "message" });
     const button = screen.getByRole("button", { name: "Send" });
@@ -45,13 +55,21 @@ describe("message component", () => {
     expect(screen.getByText(/^Hi how are you/)).toBeInTheDocument();
   });
 
-  test("deletes group when delete button is hit", async () => {
+  test("clears group when delete button is hit", async () => {
     const user = userEvent.setup();
-    customRender(<Messages />, { type: "group", name: "gabe" });
+    const messageQ = {
+      type: "group",
+      name: "gabe",
+    } as messageQueryType;
+    const updateMessageQuery = vi.fn();
+    customRender(
+      <Messages updateMessageQuery={updateMessageQuery} />,
+      messageQ
+    );
     const button = screen.getByRole("button", { name: "Delete" });
 
     await user.click(button);
 
-    expect(screen.getByText(/^No Messages Found/)).toBeInTheDocument();
+    expect(updateMessageQuery).toBeCalled();
   });
 });

@@ -23,7 +23,7 @@ function App() {
       <div className="app">
         <Header />
         <div className="body">
-          <Messages />
+          <Messages updateMessageQuery={updateMessageQuery} />
         </div>
         <SideBar updateMessageQuery={updateMessageQuery} />
       </div>
