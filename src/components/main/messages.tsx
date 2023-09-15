@@ -37,7 +37,6 @@ function Messages({ updateMessageQuery }: messageCompType) {
 
   useEffect(() => {
     const fetchMessageInfo = async () => {
-      console.log("test");
       try {
         //fetch messages call
         const results: messageResultType = {

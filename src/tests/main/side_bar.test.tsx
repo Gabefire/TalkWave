@@ -39,7 +39,7 @@ describe("side bar component", () => {
       type: "group",
       name: "gabe",
     });
-    const userButton = screen.getByRole("button", { name: "gabe" });
+    const userButton = screen.getByText(/user1/);
 
     await user.click(userButton);
 

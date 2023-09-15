@@ -10,6 +10,12 @@ export interface messageQueryType {
   type: "user" | "group" | null;
 }
 
+export interface roomType {
+  name: string;
+  type: "user" | "group";
+  id: string;
+}
+
 export interface messageResultType {
   title: string;
   type: "user" | "group" | null;

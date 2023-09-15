@@ -1,45 +1,50 @@
 import { useEffect, useState } from "react";
-import { messageQueryType } from "../../types/messages";
+import { messageQueryType, roomType } from "../../types/messages";
 
 interface sideBarType {
   updateMessageQuery: (data: messageQueryType) => void;
 }
 
 function SideBar({ updateMessageQuery }: sideBarType) {
-  const [roomList, setRoomList] = useState([] as messageQueryType[]);
+  const [roomList, setRoomList] = useState([] as roomType[]);
   const [activeButton, setActiveButton] = useState(
-    "all" as "all" | "direct" | "groups"
+    "all" as "all" | "user" | "group"
   );
 
   useEffect(() => {
     //API to get group list start in all groups
-    const roomList: messageQueryType[] = [
+    const roomList: roomType[] = [
       {
         type: "group",
         name: "group1",
+        id: "1234",
       },
       {
         type: "group",
         name: "group2",
+        id: "1235",
       },
       {
         type: "user",
         name: "user1",
+        id: "1236",
       },
       {
         type: "user",
         name: "user2",
+        id: "1237",
       },
     ];
     setRoomList(roomList);
   }, []);
-  const updateMessage = () => {
+  const updateMessage = (room: roomType) => {
     const data: messageQueryType = {
-      name: "test",
-      type: "user",
+      name: room.name,
+      type: room.type,
     };
     updateMessageQuery(data);
   };
+
   return (
     <div className="side-bar">
       <div className="side-bar-header">
@@ -58,25 +63,53 @@ function SideBar({ updateMessageQuery }: sideBarType) {
           All
         </button>
         <button
-          className={activeButton === "direct" ? "active-btn" : "inactive-btn"}
+          className={activeButton === "user" ? "active-btn" : "inactive-btn"}
           onClick={(e) => {
             console.log(e.currentTarget.value);
-            setActiveButton(e.currentTarget.value as "direct");
+            setActiveButton(e.currentTarget.value as "user");
           }}
-          value={"direct"}
+          value={"user"}
         >
           Direct
         </button>
         <button
-          className={activeButton === "groups" ? "active-btn" : "inactive-btn"}
+          className={activeButton === "group" ? "active-btn" : "inactive-btn"}
           onClick={(e) => {
             console.log(e.currentTarget.value);
-            setActiveButton(e.currentTarget.value as "groups");
+            setActiveButton(e.currentTarget.value as "group");
           }}
-          value={"groups"}
+          value={"group"}
         >
           Groups
         </button>
+      </div>
+      <div className="rooms">
+        {roomList.length > 0
+          ? roomList.map((room) => {
+              if (activeButton === "all") {
+                return (
+                  <div
+                    className="room"
+                    key={room.id}
+                    onClick={() => updateMessage(room)}
+                  >
+                    {room.name}
+                  </div>
+                );
+              }
+              if (activeButton === room.type) {
+                return (
+                  <div
+                    className="room"
+                    key={room.id}
+                    onClick={() => updateMessage(room)}
+                  >
+                    {room.name}
+                  </div>
+                );
+              }
+            })
+          : "No Rooms Found"}
       </div>
     </div>
   );
