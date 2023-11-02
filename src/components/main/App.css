@@ -8,10 +8,10 @@
   overflow-x: hidden;
 }
 
-.header {
+.top-header {
   width: 100%;
   grid-area: 1/1/2/3;
-  border: 1px solid black;
+
 }
 
 .side-bar {

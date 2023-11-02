@@ -1,8 +1,17 @@
+import "./header.css"
+
 function Header() {
   return (
-    <header className="header">
-      <div>Header</div>
-    </header>
+    <div className="top-header">
+      <div className="header-icons">
+        <button className="drop-down">=</button>
+        <div className="user-field">
+          <div className="name">Gabe</div>
+          <button className="user-drop-downs">{">"}</button>
+        </div>
+      </div>
+      <h3>TalkWave</h3>
+    </div>
   );
 }
 

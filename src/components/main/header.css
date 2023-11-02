@@ -1,0 +1,25 @@
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+}
+
+.top-header h3 {
+    padding-right: 20px;
+}
+
+.header-icons {
+    display: flex;
+    gap: 15px;
+    padding-left: 10px;
+}
+
+.user-field {
+    display: flex;
+    width: 110px;
+    justify-content: space-between;
+    border: 1px solid #888;
+    padding: 3px;
+    border-radius: 5px;
+}
