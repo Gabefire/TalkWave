@@ -1,0 +1,16 @@
+.side-bar-header {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+    align-items: center;
+}
+
+.side-bar-header button {
+    height: 2rem;
+    color: white;
+    background-color: rgb(20, 20, 20);
+    font-size: 2rem;
+    border: none;
+    cursor: pointer;
+}

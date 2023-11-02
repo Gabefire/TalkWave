@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { messageQueryType, roomType } from "../../types/messages";
 
+import "./side_bar.css";
+
 interface sideBarType {
   updateMessageQuery: (data: messageQueryType) => void;
 }
@@ -10,6 +12,7 @@ function SideBar({ updateMessageQuery }: sideBarType) {
   const [activeButton, setActiveButton] = useState(
     "all" as "all" | "user" | "group"
   );
+  const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
 
   useEffect(() => {
     //API to get group list start in all groups
@@ -49,7 +52,21 @@ function SideBar({ updateMessageQuery }: sideBarType) {
     <div className="side-bar">
       <div className="side-bar-header">
         <h2>Messaging</h2>
-        <button>+</button>
+        <div className="join-group-menu">
+          <button
+            className="join-group"
+            onClick={() => setDisplayJoinGroupMenu(!displayJoinGroupMenu)}
+          >
+            +
+          </button>
+          {displayJoinGroupMenu ? (
+            <div className="join-group-menu">
+              <div className="message-user join-group-item">Message User</div>
+              <div className="join-group join-group-item">Join Group</div>
+              <div className="create-group join-group-item">Create Group</div>
+            </div>
+          ) : undefined}
+        </div>
       </div>
       <div className="room-type-header">
         <button

@@ -11,6 +11,7 @@ export const MessageQueryContext = createContext({
   type: null as string | null,
 } as messageQueryType);
 
+
 function App() {
   const [messageQuery, setMessageQuery] = useState({} as messageQueryType);
 
