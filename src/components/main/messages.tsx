@@ -1,13 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { messageResultType, messageType } from "../../types/messages";
-import { MessageQueryContext } from "./App";
+import { MessageQueryContext } from "./main_root";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import MessageBody from "./message_body";
-import { messageQueryType } from "../../types/messages";
 
 import "./messages.css";
 
@@ -17,11 +16,7 @@ const sendMessageFormSchema = z.object({
 
 type sendMessageFormSchemaType = z.infer<typeof sendMessageFormSchema>;
 
-interface messageCompType {
-  updateMessageQuery: (data: messageQueryType) => void;
-}
-
-function Messages({ updateMessageQuery }: messageCompType) {
+function Messages() {
   const {
     register,
     handleSubmit,
@@ -123,10 +118,7 @@ function Messages({ updateMessageQuery }: messageCompType) {
         {isLoading ? (
           <div>No Messages Found</div>
         ) : (
-          <MessageBody
-            messageResults={messageResults}
-            updateMessageQuery={updateMessageQuery}
-          />
+          <MessageBody messageResults={messageResults} />
         )}
       </div>
       <form className="send-message" onSubmit={handleSubmit(onSubmit)}>

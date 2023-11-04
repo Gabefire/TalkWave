@@ -1,33 +1,21 @@
 import { useContext } from "react";
-import { messageResultType, messageQueryType } from "../../types/messages";
-import { MessageQueryContext } from "./App";
+import { messageResultType } from "../../types/messages";
+import { MessageQueryContext } from "./main_root";
 
 interface messageBodyType {
   messageResults: messageResultType;
-  updateMessageQuery: (data: messageQueryType) => void;
 }
 
-export default function MessageBody({
-  messageResults,
-  updateMessageQuery,
-}: messageBodyType) {
+export default function MessageBody({ messageResults }: messageBodyType) {
   const messageQuery = useContext(MessageQueryContext);
   const deleteGroup = async () => {
     // api call to delete message query
     console.log(messageQuery);
-    updateMessageQuery({
-      name: "",
-      type: null,
-    });
   };
 
   const leaveGroup = async () => {
     // api call to leave message query
     console.log(messageQuery);
-    updateMessageQuery({
-      name: "",
-      type: null,
-    });
   };
   return (
     <>

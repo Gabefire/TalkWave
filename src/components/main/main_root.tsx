@@ -1,18 +1,17 @@
 import { createContext, useState } from "react";
-import "./App.css";
+import { Outlet } from "react-router-dom";
+import "./main.css";
 import { messageQueryType } from "../../types/messages";
 
 import Header from "./header";
 import SideBar from "./side_bar";
-import Messages from "./messages";
 
 export const MessageQueryContext = createContext({
   name: "",
   type: null as string | null,
 } as messageQueryType);
 
-
-function App() {
+function MainRoot() {
   const [messageQuery, setMessageQuery] = useState({} as messageQueryType);
 
   const updateMessageQuery = (data: messageQueryType): void => {
@@ -24,7 +23,7 @@ function App() {
       <div className="app">
         <Header />
         <div className="body">
-          <Messages updateMessageQuery={updateMessageQuery} />
+          <Outlet />
         </div>
         <SideBar updateMessageQuery={updateMessageQuery} />
       </div>
@@ -32,4 +31,4 @@ function App() {
   );
 }
 
-export default App;
+export default MainRoot;

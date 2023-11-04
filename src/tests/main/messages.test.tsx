@@ -1,11 +1,10 @@
 import { RenderOptions, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { MessageQueryContext } from "../../components/main/App";
+import { MessageQueryContext } from "../../components/main/main_root";
 import { ReactElement } from "react";
 import { messageQueryType } from "../../types/messages";
 import Messages from "../../components/main/messages";
-import { vi } from "vitest";
 
 const customRender = (
   ui: ReactElement,
@@ -22,14 +21,12 @@ const customRender = (
 
 describe("message component", () => {
   test("Messages show default text", () => {
-    const updateMessageQuery = vi.fn();
-    render(<Messages updateMessageQuery={updateMessageQuery} />);
+    render(<Messages />);
     expect(screen.getByText(/No information/)).toBeInTheDocument();
   });
 
   test("displays messages and title", () => {
-    const updateMessageQuery = vi.fn();
-    customRender(<Messages updateMessageQuery={updateMessageQuery} />, {
+    customRender(<Messages />, {
       type: "group",
       name: "gabe",
     });
@@ -40,8 +37,7 @@ describe("message component", () => {
 
   test("adding message includes div in documents", async () => {
     const user = userEvent.setup();
-    const updateMessageQuery = vi.fn();
-    customRender(<Messages updateMessageQuery={updateMessageQuery} />, {
+    customRender(<Messages />, {
       type: "group",
       name: "gabe",
     });
@@ -61,15 +57,11 @@ describe("message component", () => {
       type: "group",
       name: "gabe",
     } as messageQueryType;
-    const updateMessageQuery = vi.fn();
-    customRender(
-      <Messages updateMessageQuery={updateMessageQuery} />,
-      messageQ
-    );
+    customRender(<Messages />, messageQ);
     const button = screen.getByRole("button", { name: "Delete" });
 
     await user.click(button);
 
-    expect(updateMessageQuery).toBeCalled();
+    expect(screen.getByText(/^gabe/)).not.toBeInTheDocument();
   });
 });
