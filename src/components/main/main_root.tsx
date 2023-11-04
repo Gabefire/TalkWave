@@ -1,5 +1,5 @@
-import { createContext, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { createContext, useEffect, useState } from "react";
+import { Outlet, useParams } from "react-router-dom";
 import "./main.css";
 import { messageQueryType } from "../../types/messages";
 
@@ -13,6 +13,20 @@ export const MessageQueryContext = createContext({
 
 function MainRoot() {
   const [messageQuery, setMessageQuery] = useState({} as messageQueryType);
+
+  const testParams = useParams();
+
+  useEffect(() => {
+    if (
+      (testParams.type == "user" || testParams.type == "group") &&
+      testParams.id
+    ) {
+      setMessageQuery({
+        name: testParams.id,
+        type: testParams.type,
+      });
+    }
+  }, [testParams]);
 
   const updateMessageQuery = (data: messageQueryType): void => {
     setMessageQuery(data);
