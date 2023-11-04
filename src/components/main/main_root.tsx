@@ -17,6 +17,7 @@ function MainRoot() {
   const testParams = useParams();
 
   useEffect(() => {
+    // GET api call to get group information based on params
     if (
       (testParams.type == "user" || testParams.type == "group") &&
       testParams.id
@@ -28,10 +29,6 @@ function MainRoot() {
     }
   }, [testParams]);
 
-  const updateMessageQuery = (data: messageQueryType): void => {
-    setMessageQuery(data);
-  };
-
   return (
     <MessageQueryContext.Provider value={messageQuery}>
       <div className="app">
@@ -39,7 +36,7 @@ function MainRoot() {
         <div className="body">
           <Outlet />
         </div>
-        <SideBar updateMessageQuery={updateMessageQuery} />
+        <SideBar />
       </div>
     </MessageQueryContext.Provider>
   );

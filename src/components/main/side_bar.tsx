@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import { messageQueryType, roomType } from "../../types/messages";
+import { roomType } from "../../types/messages";
 
 import "./side_bar.css";
+import { Link, NavLink } from "react-router-dom";
 
-interface sideBarType {
-  updateMessageQuery: (data: messageQueryType) => void;
-}
-
-function SideBar({ updateMessageQuery }: sideBarType) {
+function SideBar() {
   const [roomList, setRoomList] = useState([] as roomType[]);
   const [activeButton, setActiveButton] = useState(
     "all" as "all" | "user" | "group"
@@ -40,13 +37,6 @@ function SideBar({ updateMessageQuery }: sideBarType) {
     ];
     setRoomList(roomList);
   }, []);
-  const updateMessage = (room: roomType) => {
-    const data: messageQueryType = {
-      name: room.name,
-      type: room.type,
-    };
-    updateMessageQuery(data);
-  };
 
   return (
     <div className="side-bar">
@@ -61,9 +51,21 @@ function SideBar({ updateMessageQuery }: sideBarType) {
           </button>
           {displayJoinGroupMenu ? (
             <div className="join-group-menu">
-              <div className="message-user join-group-item">Message User</div>
-              <div className="join-group join-group-item">Join Group</div>
-              <div className="create-group join-group-item">Create Group</div>
+              <Link
+                to={"message-user"}
+                className="message-user join-group-item"
+              >
+                Message User
+              </Link>
+              <Link to={"join-group"} className="join-group join-group-item">
+                Join Group
+              </Link>
+              <Link
+                to={"create-group"}
+                className="create-group join-group-item"
+              >
+                Create Group
+              </Link>
             </div>
           ) : undefined}
         </div>
@@ -105,24 +107,24 @@ function SideBar({ updateMessageQuery }: sideBarType) {
           ? roomList.map((room) => {
               if (activeButton === "all") {
                 return (
-                  <div
+                  <NavLink
+                    to={`${room.type}/${room.id}`}
                     className="room"
                     key={room.id}
-                    onClick={() => updateMessage(room)}
                   >
                     {room.name}
-                  </div>
+                  </NavLink>
                 );
               }
               if (activeButton === room.type) {
                 return (
-                  <div
+                  <NavLink
+                    to={`${room.type}/${room.id}`}
                     className="room"
                     key={room.id}
-                    onClick={() => updateMessage(room)}
                   >
                     {room.name}
-                  </div>
+                  </NavLink>
                 );
               }
             })
