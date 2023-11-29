@@ -3,8 +3,8 @@ import { Outlet, useParams } from "react-router-dom";
 import "./main.css";
 import { messageQueryType } from "../../types/messages";
 
-import Header from "./header";
-import SideBar from "./side_bar";
+import Header from "./header/header";
+import SideBar from "./side_bar/side_bar";
 
 export const MessageQueryContext = createContext({
   name: "",

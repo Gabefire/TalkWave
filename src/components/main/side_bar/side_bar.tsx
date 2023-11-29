@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { roomType } from "../../types/messages";
+import { roomType } from "../../../types/messages";
 
 import "./side_bar.css";
 import { Link, NavLink } from "react-router-dom";

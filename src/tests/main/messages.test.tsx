@@ -4,7 +4,9 @@ import userEvent from "@testing-library/user-event";
 import { MessageQueryContext } from "../../components/main/main_root";
 import { ReactElement } from "react";
 import { messageQueryType } from "../../types/messages";
-import Messages from "../../components/main/messages";
+import Messages from "../../components/main/message/messages";
+
+import { vi } from "vitest";
 
 const customRender = (
   ui: ReactElement,
@@ -18,6 +20,13 @@ const customRender = (
     renderOptions
   );
 };
+
+const mockedUsedNavigate = vi.fn();
+
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useNavigate: () => mockedUsedNavigate,
+}));
 
 describe("message component", () => {
   test("Messages show default text", () => {
@@ -51,7 +60,7 @@ describe("message component", () => {
     expect(screen.getByText(/^Hi how are you/)).toBeInTheDocument();
   });
 
-  test("clears group when delete button is hit", async () => {
+  test("switches url when delete button is hit", async () => {
     const user = userEvent.setup();
     const messageQ = {
       type: "group",
@@ -62,6 +71,6 @@ describe("message component", () => {
 
     await user.click(button);
 
-    expect(screen.getByText(/^gabe/)).not.toBeInTheDocument();
+    expect(global.window.location.pathname).not.toContain("/group/1234");
   });
 });

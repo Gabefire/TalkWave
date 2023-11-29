@@ -9,10 +9,10 @@ import SignUp from "./components/auth/sign_up.tsx";
 
 import { login, signUp } from "./components/auth/auth_util.ts";
 import AuthRoot from "./components/auth/auth_root.tsx";
-import Messages from "./components/main/messages.tsx";
-import JoinGroup from "./components/main/join_group.tsx";
-import CreateGroup from "./components/main/create_group.tsx";
-import MessageUser from "./components/main/message_user.tsx";
+import Messages from "./components/main/message/messages.tsx";
+import JoinGroup from "./components/main/message/join_group.tsx";
+import CreateGroup from "./components/main/message/create_group.tsx";
+import MessageUser from "./components/main/message/message_user.tsx";
 
 const router = createBrowserRouter([
   {

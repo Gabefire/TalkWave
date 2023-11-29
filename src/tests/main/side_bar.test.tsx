@@ -1,10 +1,10 @@
 import { RenderOptions, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { MessageQueryContext } from "../../components/main/App";
+import { MessageQueryContext } from "../../components/main/main_root";
 import { ReactElement } from "react";
-import SideBar from "../../components/main/side_bar";
-import { vi } from "vitest";
+import SideBar from "../../components/main/side_bar/side_bar";
+import { BrowserRouter } from "react-router-dom";
 import { messageQueryType } from "../../types/messages";
 
 const customRender = (
@@ -22,27 +22,35 @@ const customRender = (
 
 describe("side bar component", () => {
   it("shows header", () => {
-    const updateMessageQuery = vi.fn();
-    customRender(<SideBar updateMessageQuery={updateMessageQuery} />, {
-      type: "group",
-      name: "gabe",
-    });
+    customRender(
+      <BrowserRouter>
+        <SideBar />
+      </BrowserRouter>,
+      {
+        type: "group",
+        name: "gabe",
+      }
+    );
 
     expect(
       screen.getByRole("heading", { name: "Messaging" })
     ).toBeInTheDocument();
   });
   it("changes message query upon click", async () => {
-    const updateMessageQuery = vi.fn();
     const user = userEvent.setup();
-    customRender(<SideBar updateMessageQuery={updateMessageQuery} />, {
-      type: "group",
-      name: "gabe",
-    });
+    customRender(
+      <BrowserRouter>
+        <SideBar />
+      </BrowserRouter>,
+      {
+        type: "group",
+        name: "gabe",
+      }
+    );
     const userButton = screen.getByText(/user1/);
 
     await user.click(userButton);
-
-    expect(updateMessageQuery).toBeCalled();
+    console.log(global.window.location.pathname);
+    expect(global.window.location.pathname).toBe("/user/1236");
   });
 });

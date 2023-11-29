@@ -1,6 +1,7 @@
 import { useContext } from "react";
-import { messageResultType } from "../../types/messages";
-import { MessageQueryContext } from "./main_root";
+import { messageResultType } from "../../../types/messages";
+import { MessageQueryContext } from "../main_root";
+import { useNavigate } from "react-router-dom";
 
 interface messageBodyType {
   messageResults: messageResultType;
@@ -8,13 +9,18 @@ interface messageBodyType {
 
 export default function MessageBody({ messageResults }: messageBodyType) {
   const messageQuery = useContext(MessageQueryContext);
+
+  const navigate = useNavigate();
+
   const deleteGroup = async () => {
     // api call to delete message query
+    navigate("/main");
     console.log(messageQuery);
   };
 
   const leaveGroup = async () => {
     // api call to leave message query
+    navigate("/main");
     console.log(messageQuery);
   };
   return (

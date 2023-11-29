@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { messageResultType, messageType } from "../../types/messages";
-import { MessageQueryContext } from "./main_root";
+import { messageResultType, messageType } from "../../../types/messages";
+import { MessageQueryContext } from "../main_root";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
