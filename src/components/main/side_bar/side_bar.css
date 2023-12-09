@@ -42,6 +42,7 @@
 .join-group-menu {
     position: absolute;
     right: 0;
+    top: 39px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -52,9 +53,24 @@
 }
 
 .join-group-item {
+    z-index: 1;
     font-size: 0.8rem;
     text-align: right;
     text-decoration: none;
     color: white;
-    width: 100px;
+    width: 90px;
 }
+
+.popover > .triangle {
+    position: absolute;
+    display: block;
+    width: 20px;
+    height: 20px;
+    z-index: 0;
+    background-color: rgb(44, 44, 44);
+    border: none;
+    transform: rotate(45deg);
+    top: -4px;
+    right: 5px;
+}
+

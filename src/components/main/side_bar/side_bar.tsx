@@ -59,7 +59,8 @@ function SideBar() {
             +
           </button>
           {displayJoinGroupMenu ? (
-            <div className="join-group-menu" ref={wrapperRef}>
+            <div className="join-group-menu popover" ref={wrapperRef}>
+              <div className="triangle"></div>
               <Link
                 to={"message-user"}
                 className="message-user join-group-item"
