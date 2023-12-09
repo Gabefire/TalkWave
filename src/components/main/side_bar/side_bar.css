@@ -74,3 +74,20 @@
     right: 5px;
 }
 
+.room-type-header > button {
+    cursor: pointer;
+    color: white;
+    background-color: rgb(20, 20, 20);
+    border: none;
+    font-family: inherit;
+    font-size: 1.2rem;
+}
+
+.room-type-header button:nth-child(-n + 2) {
+    border-right: solid white 2px;
+}
+
+.room-type-header .active-btn {
+    text-decoration: underline;
+    cursor: default;
+}
