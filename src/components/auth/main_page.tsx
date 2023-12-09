@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { loginErrorType } from "../../types/auth";
 
 interface mainPageType {
@@ -8,7 +8,9 @@ interface mainPageType {
   }) => Promise<void | loginErrorType[]>;
 }
 
-const MainPage = ({ login }: mainPageType) => {
+export default function MainPage({ login }: mainPageType) {
+  const navigate = useNavigate();
+
   const loginTryMe = async () => {
     try {
       await login({ username: "Guest", password: "12345" });
@@ -19,7 +21,6 @@ const MainPage = ({ login }: mainPageType) => {
     }
   };
 
-  const navigate = useNavigate();
   return (
     <div className="auth">
       <h1>Welcome to TalkWave</h1>
@@ -29,11 +30,9 @@ const MainPage = ({ login }: mainPageType) => {
       <button className="auth-btn sign-up" onClick={() => navigate("/sign-up")}>
         Sign Up
       </button>
-      <Link className="auth-link guest" to="/main" onClick={loginTryMe}>
+      <button className="auth-link guest" onClick={loginTryMe}>
         Continue as Guest
-      </Link>
+      </button>
     </div>
   );
-};
-
-export default MainPage;
+}

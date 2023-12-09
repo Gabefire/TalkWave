@@ -83,7 +83,6 @@ function SideBar() {
         <button
           className={activeButton === "all" ? "active-btn" : "inactive-btn"}
           onClick={(e) => {
-            console.log(e.currentTarget.value);
             setActiveButton(e.currentTarget.value as "all");
           }}
           value={"all"}
@@ -93,7 +92,6 @@ function SideBar() {
         <button
           className={activeButton === "user" ? "active-btn" : "inactive-btn"}
           onClick={(e) => {
-            console.log(e.currentTarget.value);
             setActiveButton(e.currentTarget.value as "user");
           }}
           value={"user"}
@@ -103,7 +101,6 @@ function SideBar() {
         <button
           className={activeButton === "group" ? "active-btn" : "inactive-btn"}
           onClick={(e) => {
-            console.log(e.currentTarget.value);
             setActiveButton(e.currentTarget.value as "group");
           }}
           value={"group"}

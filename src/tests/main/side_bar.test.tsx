@@ -50,7 +50,72 @@ describe("side bar component", () => {
     const userButton = screen.getByText(/user1/);
 
     await user.click(userButton);
-    console.log(global.window.location.pathname);
+
     expect(global.window.location.pathname).toBe("/user/1236");
+  });
+  it("Drop down menu to create groups shows upon click", async () => {
+    const user = userEvent.setup();
+    customRender(
+      <BrowserRouter>
+        <SideBar />
+      </BrowserRouter>,
+      {
+        type: "group",
+        name: "gabe",
+      }
+    );
+    const dropDownBtn = screen.getByRole("button", { name: "+" });
+
+    await user.click(dropDownBtn);
+
+    expect(screen.getByText(/Join Group/)).toBeVisible();
+  });
+  it("Drop down menu to create groups disappears when clicking somewhere else in doc", async () => {
+    const user = userEvent.setup();
+    customRender(
+      <BrowserRouter>
+        <SideBar />
+      </BrowserRouter>,
+      {
+        type: "group",
+        name: "gabe",
+      }
+    );
+    const dropDownBtn = screen.getByRole("button", { name: "+" });
+
+    await user.click(dropDownBtn);
+
+    const join_button = screen.getByText(/Join Group/);
+
+    expect(join_button).toBeInTheDocument();
+
+    const randomLocation = screen.getByRole("button", { name: "All" });
+
+    await user.click(randomLocation);
+
+    expect(join_button).not.toBeInTheDocument();
+  });
+  it("Drop down menu button will close create group menu when pressed again", async () => {
+    const user = userEvent.setup();
+    customRender(
+      <BrowserRouter>
+        <SideBar />
+      </BrowserRouter>,
+      {
+        type: "group",
+        name: "gabe",
+      }
+    );
+    const dropDownBtn = screen.getByRole("button", { name: "+" });
+
+    await user.click(dropDownBtn);
+
+    const join_button = screen.getByText(/Join Group/);
+
+    expect(join_button).toBeInTheDocument();
+
+    await user.click(dropDownBtn);
+
+    expect(join_button).not.toBeInTheDocument();
   });
 });
