@@ -4,7 +4,7 @@ import { roomType } from "../../../types/messages";
 import "./side_bar.css";
 import { Link, NavLink } from "react-router-dom";
 
-import useClickOutside from "./useClickOutside";
+import useClickOutside from "../useClickOutside";
 
 function SideBar() {
   const [roomList, setRoomList] = useState([] as roomType[]);
@@ -15,9 +15,13 @@ function SideBar() {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const additionalRef = useRef<HTMLButtonElement>(null);
-  useClickOutside(wrapperRef, additionalRef, () => {
-    setDisplayJoinGroupMenu(false);
-  });
+  useClickOutside(
+    wrapperRef,
+    () => {
+      setDisplayJoinGroupMenu(false);
+    },
+    additionalRef
+  );
 
   useEffect(() => {
     //API to get group list start in all groups

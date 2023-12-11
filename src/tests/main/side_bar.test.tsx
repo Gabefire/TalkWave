@@ -113,9 +113,13 @@ describe("side bar component", () => {
     const join_button = screen.getByText(/Join Group/);
 
     expect(join_button).toBeInTheDocument();
-
     await user.click(dropDownBtn);
-
-    expect(join_button).not.toBeInTheDocument();
+    expect(
+      await screen
+        .findByText(/Join Group/, undefined, { timeout: 100 })
+        .catch(() => {
+          return false;
+        })
+    ).toBeFalsy();
   });
 });
