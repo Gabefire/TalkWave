@@ -39,10 +39,9 @@
     position: relative;
 }
 
-.join-group-menu {
+.join-group-menu,
+.popover {
     position: absolute;
-    right: 0;
-    top: 39px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -50,6 +49,11 @@
     background-color: rgb(44, 44, 44);
     border-radius: 5px;
     padding: 7px;
+}
+
+.join-group-menu {
+    right: 0;
+    top: 39px
 }
 
 .join-group-item {

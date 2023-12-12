@@ -9,17 +9,25 @@
     padding-right: 20px;
 }
 
-.header-icons {
+.profile-icons {
+    
     display: flex;
-    gap: 15px;
+    gap: 20px;
     padding-left: 10px;
+    cursor: pointer;
 }
 
 .user-field {
+    position: relative;
     display: flex;
-    width: 110px;
     justify-content: space-between;
     border: 1px solid #888;
     padding: 3px;
+    gap: 10px;
     border-radius: 5px;
+}
+
+.profile {
+    right: 0;
+    top: 35px
 }
