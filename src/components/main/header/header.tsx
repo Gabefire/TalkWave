@@ -11,6 +11,7 @@ function Header() {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const additionalRef = useRef<HTMLDivElement>(null);
+  const searchBar = useRef<HTMLInputElement>(null);
 
   useClickOutside(
     wrapperRef,
@@ -47,8 +48,13 @@ function Header() {
       </div>
       <div className="right-header">
         <div className="search-container">
-          <SearchIcon height={"2rem"} fill="white" />
-          <input type="text" className="search-bar" />
+          <SearchIcon
+            height={"2rem"}
+            fill="white"
+            onClick={() => searchBar.current!.focus()}
+            cursor={"pointer"}
+          />
+          <input type="search" className="search-bar" ref={searchBar} />
         </div>
       </div>
     </div>
