@@ -65,19 +65,13 @@ function SideBar() {
           {displayJoinGroupMenu ? (
             <div className="join-group-menu popover" ref={wrapperRef}>
               <div className="triangle"></div>
-              <Link
-                to={"message-user"}
-                className="message-user join-group-item"
-              >
+              <Link to={"message-user"} className="message-user popover-item">
                 Message User
               </Link>
-              <Link to={"join-group"} className="join-group join-group-item">
+              <Link to={"join-group"} className="join-group popover-item">
                 Join Group
               </Link>
-              <Link
-                to={"create-group"}
-                className="create-group join-group-item"
-              >
+              <Link to={"create-group"} className="create-group popover-item">
                 Create Group
               </Link>
             </div>
