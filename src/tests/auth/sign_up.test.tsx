@@ -115,7 +115,7 @@ describe("sign up component", () => {
     await user.type(passwordConfirmation, "test");
     await user.click(button);
 
-    expect(login).not.toBeCalled();
+    expect(login).not.toHaveBeenCalled();
     expect(await screen.findByText(/test error/i)).toBeVisible();
   });
 });

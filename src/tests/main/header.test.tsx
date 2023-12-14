@@ -76,4 +76,47 @@ describe("header component", () => {
         })
     ).toBeFalsy();
   });
+  it("Search bar drops menu when clicked", async () => {
+    const user = userEvent.setup();
+    customRender(
+      <BrowserRouter>
+        <Header />
+      </BrowserRouter>,
+      {
+        type: "group",
+        name: "gabe",
+      }
+    );
+
+    const searchBar = screen.getByRole("searchbox");
+    console.log(global.window.location.pathname);
+    await user.type(searchBar, "test");
+
+    expect(
+      await screen.findByRole("heading", { name: /Groups/ })
+    ).toBeInTheDocument();
+  });
+  it("Clicking search link switches page", async () => {
+    const user = userEvent.setup();
+    const currentPage = location.href;
+    customRender(
+      <BrowserRouter>
+        <Header />
+      </BrowserRouter>,
+      {
+        type: "group",
+        name: "gabe",
+      }
+    );
+
+    const searchBar = screen.getByRole("searchbox");
+
+    await user.type(searchBar, "test");
+
+    const testLink = screen.getByRole("link");
+
+    await user.click(testLink);
+
+    expect(location.href).not.toBe(currentPage);
+  });
 });
