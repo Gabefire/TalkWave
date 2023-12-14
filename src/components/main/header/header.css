@@ -1,8 +1,10 @@
 .top-header {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
     align-items: center;
     width: 100vw;
+    gap: 10px;
+    padding-top: 10px;
 }
 
 .top-header h3 {
@@ -20,6 +22,11 @@
 
 .left-header h3 {
     padding: 0;
+}
+
+.right-header {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .user-field {
@@ -43,17 +50,17 @@
     align-items: center;
     background-color: rgb(90, 90, 90);
     border-radius: 7px;
-    margin-right: 5px;
-    width: 300px;
     height: 32px;
     padding-left: 10px;
+    padding-right: 10px;
     margin-right: 10px;
 
 }
 
 .search-bar {
     height: 25px;
-    width: 300px;
+    flex-shrink: 2;
+    width: clamp(250px, 40vw, 620px);
     color: white;
     font-family: inherit;
     font-size: 1rem;

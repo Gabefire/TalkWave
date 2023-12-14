@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import useClickOutside from "../useClickOutside";
-import SearchIcon from "./magnify.svg?react";
+import SearchIcon from "../../../assets/magnify.svg?react";
 
 import "./header.css";
 
@@ -49,7 +49,7 @@ function Header() {
       <div className="right-header">
         <div className="search-container">
           <SearchIcon
-            height={"2rem"}
+            height={"1.8rem"}
             fill="white"
             onClick={() => searchBar.current!.focus()}
             cursor={"pointer"}
