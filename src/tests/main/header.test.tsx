@@ -113,7 +113,7 @@ describe("header component", () => {
 
     await user.type(searchBar, "test");
 
-    const testLink = screen.getByRole("link");
+    const testLink = screen.getAllByRole("link")[0];
 
     await user.click(testLink);
 

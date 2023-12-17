@@ -47,6 +47,7 @@
 
 .search-container {
     display: flex;
+    position: relative;
     align-items: center;
     background-color: rgb(90, 90, 90);
     border-radius: 7px;
@@ -78,4 +79,39 @@
 
 .search-bar:focus {
     outline: none;
+}
+
+.search-box {
+    position: absolute;
+    top: 25px;
+    left: 0;
+    width: 100%;
+    /* top right bottom left */
+    padding: 0 0 10px 10px;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.search-box h5 {
+    padding: 0;
+    color: rgb(218, 218, 218, 0.4);
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.search-section {
+    min-height: 50px;
+}
+
+.results {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.results a {
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: white;
+    font-family: inherit;
 }
