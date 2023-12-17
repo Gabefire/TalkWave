@@ -65,13 +65,13 @@ function SideBar() {
           {displayJoinGroupMenu ? (
             <div className="join-group-menu popover" ref={wrapperRef}>
               <div className="triangle"></div>
-              <Link to={"message-user"} className="message-user popover-item">
-                Message User
-              </Link>
-              <Link to={"join-group"} className="join-group popover-item">
-                Join Group
-              </Link>
-              <Link to={"create-group"} className="create-group popover-item">
+              <Link
+                to={"create-group"}
+                className="create-group popover-item"
+                onClick={(e) => {
+                  if (e) setDisplayJoinGroupMenu(false);
+                }}
+              >
                 Create Group
               </Link>
             </div>

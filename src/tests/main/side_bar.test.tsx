@@ -68,7 +68,7 @@ describe("side bar component", () => {
 
     await user.click(dropDownBtn);
 
-    expect(screen.getByText(/Join Group/)).toBeVisible();
+    expect(screen.getByText(/Create Group/)).toBeVisible();
   });
   it("Drop down menu to create groups disappears when clicking somewhere else in doc", async () => {
     const user = userEvent.setup();
@@ -85,7 +85,7 @@ describe("side bar component", () => {
 
     await user.click(dropDownBtn);
 
-    const join_button = screen.getByText(/Join Group/);
+    const join_button = screen.getByText(/Create Group/);
 
     expect(join_button).toBeInTheDocument();
 
@@ -110,13 +110,13 @@ describe("side bar component", () => {
 
     await user.click(dropDownBtn);
 
-    const join_button = screen.getByText(/Join Group/);
+    const join_button = screen.getByText(/Create Group/);
 
     expect(join_button).toBeInTheDocument();
     await user.click(dropDownBtn);
     expect(
       await screen
-        .findByText(/Join Group/, undefined, { timeout: 100 })
+        .findByText(/Create Group/, undefined, { timeout: 100 })
         .catch(() => {
           return false;
         })
