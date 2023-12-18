@@ -90,3 +90,18 @@
 .submit-message-btn {
   margin: 0 10px 10px 0;
 }
+
+.from {
+  font-size: 1.0rem;
+}
+
+.date-posted {
+  font-size: 0.7rem;
+  color: rgb(213, 212, 212, 0.7);
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

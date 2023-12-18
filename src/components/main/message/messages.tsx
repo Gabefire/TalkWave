@@ -10,16 +10,20 @@ import MessageBody from "./message_body";
 
 import "./messages.css";
 
+// Types
 const sendMessageFormSchema = z.object({
   message: z.string().min(1),
 });
 
 type sendMessageFormSchemaType = z.infer<typeof sendMessageFormSchema>;
 
+// Message Component
 function Messages() {
   const {
     register,
     handleSubmit,
+    reset,
+    setFocus,
     formState: { isSubmitting },
   } = useForm<sendMessageFormSchemaType>({
     resolver: zodResolver(sendMessageFormSchema),
@@ -85,6 +89,8 @@ function Messages() {
     } catch (error) {
       // toDO better error handler
       console.error(error);
+    } finally {
+      setFocus("message");
     }
   };
 
@@ -101,6 +107,7 @@ function Messages() {
         };
       });
     }
+    reset();
   };
 
   // to do better no info comp

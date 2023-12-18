@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { messageResultType } from "../../../types/messages";
 import { MessageQueryContext } from "../main_root";
 import { useNavigate } from "react-router-dom";
+import dateConverter from "../dateConverter";
 
 interface messageBodyType {
   messageResults: messageResultType;
@@ -58,19 +59,23 @@ export default function MessageBody({ messageResults }: messageBodyType) {
                   }
                   key={`message-${index}`}
                 >
-                  {/* toDo add better date */}
-                  <h6
+                  <div
                     className="message-header"
                     style={
                       post.owner
                         ? {
-                            marginRight: "auto",
+                            justifyContent: "flex-end",
                           }
                         : {
-                            marginLeft: "auto",
+                            justifyContent: "start",
                           }
                     }
-                  >{`${post.from} ${post.date}`}</h6>
+                  >
+                    <div className="from">{post.from}</div>
+                    <div className="date-posted">
+                      {dateConverter(post.date)}
+                    </div>
+                  </div>
                   <p>{post.content}</p>
                 </div>
               );
