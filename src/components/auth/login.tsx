@@ -18,7 +18,7 @@ const loginFormSchema = z.object({
 
 type loginFormSchemaType = z.infer<typeof loginFormSchema>;
 
-const Login = ({ login }: loginType) => {
+function Login({ login }: loginType) {
   const {
     register,
     handleSubmit,
@@ -96,6 +96,6 @@ const Login = ({ login }: loginType) => {
       </button>
     </form>
   );
-};
+}
 
 export default Login;

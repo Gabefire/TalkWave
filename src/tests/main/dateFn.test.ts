@@ -4,7 +4,7 @@ import addHours from "date-fns/addHours";
 import addMinutes from "date-fns/addMinutes";
 
 describe("date function", () => {
-  it("converst something from 30 secs to now", () => {
+  it("converts something from 30 secs to now", () => {
     let currentDate = new Date();
     currentDate = addSeconds(currentDate, -30);
     expect(dateConverter(currentDate)).toBe("Now");

@@ -24,9 +24,9 @@ export default function dateConverter(date: dateType | Date): string {
   if (diffMinutes >= 1440 * 30) {
     const months = Math.floor(diffMinutes / (1440 * 30));
     if (months === 1) {
-      return `${months} year ago`;
+      return `${months} month ago`;
     }
-    return `${months} years ago`;
+    return `${months} months ago`;
   }
   if (diffMinutes >= 1440) {
     const days = Math.floor(diffMinutes / 1440);

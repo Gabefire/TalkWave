@@ -6,6 +6,7 @@ import "./index.css";
 import MainPage from "./components/auth/main_page.tsx";
 import Login from "./components/auth/login.tsx";
 import SignUp from "./components/auth/sign_up.tsx";
+import EditProfile from "./components/auth/edit_profile.tsx";
 
 import { login, signUp } from "./components/auth/auth_util.ts";
 import AuthRoot from "./components/auth/auth_root.tsx";
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { index: true, element: <MainPage login={login} /> },
       { path: "login", element: <Login login={login} /> },
       { path: "sign-up", element: <SignUp login={login} signUp={signUp} /> },
+      { path: "edit-profile", element: <EditProfile /> },
     ],
   },
 ]);
