@@ -1,43 +1,47 @@
 import { loginErrorType, signUpErrorType } from "../../types/auth";
+import axios from "axios";
+
+axios.defaults.baseURL = import.meta.env.API_URL;
 
 export const signUp = async (signUpUser: {
-  username: string;
+  userName: string;
   password: string;
-  passwordConfirmation: string;
-  email?: string;
+  email: string;
 }): Promise<void | signUpErrorType[]> => {
-  // API call to sign up user return JWT token and log in
   try {
-    if (signUpUser.username === "error") {
-      throw new Error("something went wrong");
-    } else {
-      console.log(signUpUser);
-    }
+    const result = await axios.post("/api/User/register", signUpUser)
+    if (result.status != 200) {
+      throw new Error(result.data);
+    } 
   } catch (err) {
+
     if (typeof err === "string") {
       return [{ root: err }];
-    } else if (err instanceof Error) {
-      return [{ root: err.message }];
+    } else if (axios.isAxiosError(err)){
+      if (err.response?.status == 409)
+      {
+        return [{ root: err.response?.data }];
+      }
+      else
+      {
+        return [{root: "Something went wrong"}]
+      }
     }
   }
 };
 
 export const login = async (user: {
-  username: string;
+  email: string;
   password: string;
 }): Promise<void | loginErrorType[]> => {
-  // API call to log in JWT token added to local storage
   try {
-    if (user.username === "error") {
-      throw new Error("something went wrong");
-    } else {
-      console.log(user);
-    }
+    const jwt  = (await axios.post<string>("/api/User/login", user)).data
+    localStorage.setItem("auth", jwt)
   } catch (err) {
     if (typeof err === "string") {
       return [{ root: err }];
-    } else if (err instanceof Error) {
-      return [{ root: err.message }];
+    } else if (axios.isAxiosError(err)) {
+      return [{ root: err.response?.data }];
+      }
     }
-  }
-};
+  };

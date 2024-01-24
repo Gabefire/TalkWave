@@ -11,9 +11,10 @@ import EditProfile from "./components/auth/edit_profile.tsx";
 import { login, signUp } from "./components/auth/auth_util.ts";
 import AuthRoot from "./components/auth/auth_root.tsx";
 import Messages from "./components/main/message/messages.tsx";
-import JoinGroup from "./components/main/message/join_group.tsx";
 import CreateGroup from "./components/main/message/create_group.tsx";
-import MessageUser from "./components/main/message/message_user.tsx";
+import axios from "axios";
+
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 const router = createBrowserRouter([
   {
@@ -21,9 +22,7 @@ const router = createBrowserRouter([
     element: <MainRoot />,
     children: [
       { path: ":type/:id", element: <Messages /> },
-      { path: "join-group", element: <JoinGroup /> },
       { path: "create-group", element: <CreateGroup /> },
-      { path: "message-user", element: <MessageUser /> },
     ],
   },
   {

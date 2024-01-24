@@ -6,28 +6,27 @@ import { useNavigate } from "react-router-dom";
 
 interface signUpType {
   login: (user: {
-    username: string;
+    email: string;
     password: string;
   }) => Promise<void | loginErrorType[]>;
   signUp: (user: {
-    username: string;
-    email?: string;
+    userName: string;
+    email: string;
     password: string;
-    passwordConfirmation: string;
   }) => Promise<void | signUpErrorType[]>;
 }
 
 const signUpFormSchema = z
   .object({
-    username: z.string().min(1, "Username is required").max(100),
-    email: z.string().email("Invalid email").optional().or(z.literal("")),
+    userName: z.string().min(1, "Username is required").max(100),
+    email: z.string().email("Invalid email").or(z.literal("")),
     password: z.string().min(1, "Password is required"),
     passwordConfirmation: z
       .string()
       .min(1, "Password confirmation is required"),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
-    path: ["confirmPassword"],
+    path: ["passwordConfirmation"],
     message: "Passwords do not match",
   });
 
@@ -49,12 +48,14 @@ const SignUp = ({ signUp, login }: signUpType) => {
     results.forEach((obj) => {
       const key = Object.keys(obj)[0];
       const value = Object.values(obj)[0];
-      if (key === "username") {
-        setError("username", { type: "manual", message: `${value}` });
+      if (key === "userName") {
+        setError("userName", { type: "manual", message: `${value}` });
       } else if (key === "password") {
         setError("password", { type: "manual", message: `${value}` });
-      } else if (key === "serverError") {
-        setError("root.serverError", { type: "404", message: `${value}` });
+      } else if (key == "email") {
+        setError("email", { type: "manual", message: `${value}` });
+      } else if (key === "root") {
+        setError("root.serverError", { type: "manual", message: `${value}` });
       } else if (key === "passwordConfirmation") {
         setError("passwordConfirmation", {
           type: "manual",
@@ -73,7 +74,7 @@ const SignUp = ({ signUp, login }: signUpType) => {
       return;
     } else {
       const loginResults = await login({
-        username: user.username,
+        email: user.email,
         password: user.password,
       });
       if (loginResults instanceof Array && loginResults.length > 0) {
@@ -94,12 +95,12 @@ const SignUp = ({ signUp, login }: signUpType) => {
           id="username"
           placeholder="Enter Username"
           className="form-input"
-          {...register("username")}
+          {...register("userName")}
         />
         <span className="required-span"></span>
-        {errors.username && (
+        {errors.userName && (
           <span className="field-error" aria-live="polite">
-            {errors.username?.message}
+            {errors.userName?.message}
           </span>
         )}
       </label>

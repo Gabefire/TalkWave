@@ -3,7 +3,7 @@ import { loginErrorType } from "../../types/auth";
 
 interface mainPageType {
   login: (user: {
-    username: string;
+    email: string;
     password: string;
   }) => Promise<void | loginErrorType[]>;
 }
@@ -13,7 +13,7 @@ export default function MainPage({ login }: mainPageType) {
 
   const loginTryMe = async () => {
     try {
-      await login({ username: "Guest", password: "12345" });
+      await login({ email: "test@test.com", password: "1234" });
     } catch (err) {
       console.error(err);
     } finally {

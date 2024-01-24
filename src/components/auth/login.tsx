@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 
 interface loginType {
   login: (user: {
-    username: string;
+    email: string;
     password: string;
   }) => Promise<void | loginErrorType[]>;
 }
 
 const loginFormSchema = z.object({
-  username: z.string().min(1, "Username is required").max(100),
+  email: z.string().min(1, "Email is required").max(100),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -30,12 +30,13 @@ function Login({ login }: loginType) {
 
   const onSubmit: SubmitHandler<loginFormSchemaType> = async (user) => {
     const results = await login(user);
+
     if (results instanceof Array) {
       results.forEach((obj) => {
         const key = Object.keys(obj)[0];
         const value = Object.values(obj)[0];
-        if (key === "username") {
-          setError("username", { type: "manual", message: `${value}` });
+        if (key === "email") {
+          setError("email", { type: "manual", message: `${value}` });
         } else if (key === "password") {
           setError("password", { type: "manual", message: `${value}` });
         } else if (key === "serverError") {
@@ -50,20 +51,20 @@ function Login({ login }: loginType) {
   return (
     <form className="form" onSubmit={handleSubmit(onSubmit)}>
       <h1>Login</h1>
-      <label htmlFor="username" className="form-group">
-        Username:
+      <label htmlFor="email" className="form-group">
+        Email:
         <input
-          aria-label="username"
+          aria-label="email"
           type="text"
-          id="username"
-          placeholder="Enter Username"
+          id="email"
+          placeholder="Enter email"
           className="form-input"
-          {...register("username")}
+          {...register("email")}
         />
         <span className="required-span"></span>
-        {errors.username && (
+        {errors.email && (
           <span className="field-error" aria-live="polite">
-            {errors.username?.message}
+            {errors.email?.message}
           </span>
         )}
       </label>
