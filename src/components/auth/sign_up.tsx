@@ -81,7 +81,7 @@ const SignUp = ({ signUp, login }: signUpType) => {
         validateResults(loginResults);
         return;
       }
-      navigate("/");
+      navigate("/main");
     }
   };
   return (

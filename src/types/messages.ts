@@ -10,10 +10,11 @@ export interface messageQueryType {
   type: "user" | "group" | null;
 }
 
-export interface roomType {
+export interface channelType {
   name: string;
   type: "user" | "group";
-  id: string;
+  channelId: string;
+  isOwner: boolean;
 }
 
 export interface messageResultType {

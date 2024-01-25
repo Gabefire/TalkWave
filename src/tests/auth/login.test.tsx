@@ -28,7 +28,7 @@ describe("login component", () => {
     render(<Login login={login} />);
 
     const username = screen.getByRole("textbox", {
-      name: "username",
+      name: "email",
     });
 
     const password = screen.getByLabelText(/Password:/i);
@@ -51,9 +51,10 @@ describe("login component", () => {
     await user.click(button);
 
     expect(login).not.toBeCalled();
-    expect(await screen.findByText(/Username is Required/i)).toBeVisible();
+    expect(await screen.findByText(/Email is Required/i)).toBeVisible();
     expect(await screen.findByText(/Password is Required/i)).toBeVisible();
   });
+
   it("error should show if login api fails", async () => {
     const login = vi.fn().mockImplementation(() => {
       return [{ serverError: "test error" }];
@@ -62,7 +63,7 @@ describe("login component", () => {
     render(<Login login={login} />);
 
     const username = screen.getByRole("textbox", {
-      name: "username",
+      name: "email",
     });
 
     const password = screen.getByLabelText(/Password:/i);

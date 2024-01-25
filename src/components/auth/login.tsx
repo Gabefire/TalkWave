@@ -45,7 +45,7 @@ function Login({ login }: loginType) {
       });
       return;
     } else {
-      navigate("/");
+      navigate("/main");
     }
   };
   return (

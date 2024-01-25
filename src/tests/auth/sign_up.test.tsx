@@ -70,7 +70,7 @@ describe("sign up component", () => {
   it("error should show if login api fails", async () => {
     const signUp = vi.fn();
     const login = vi.fn().mockImplementation(() => {
-      return [{ serverError: "test error" }];
+      return [{ root: "test error" }];
     });
 
     const user = userEvent.setup();
@@ -96,7 +96,7 @@ describe("sign up component", () => {
   it("error should show if sign up api fails", async () => {
     const login = vi.fn();
     const signUp = vi.fn().mockImplementation(() => {
-      return [{ serverError: "test error" }];
+      return [{ root: "test error" }];
     });
 
     const user = userEvent.setup();

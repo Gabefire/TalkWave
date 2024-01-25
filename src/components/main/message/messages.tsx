@@ -87,7 +87,7 @@ function Messages() {
         owner: true,
       };
     } catch (error) {
-      // toDO better error handler
+      // todo better error handler
       console.error(error);
     } finally {
       setFocus("message");

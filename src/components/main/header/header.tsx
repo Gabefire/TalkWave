@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useClickOutside from "../useClickOutside";
 import SearchIcon from "../../../assets/magnify.svg?react";
-import { roomType } from "../../../types/messages";
+import { channelType } from "../../../types/messages";
 
 import "./header.css";
 
@@ -11,7 +11,7 @@ function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
   const [displaySearchBox, setDisplaySearchBox] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([] as roomType[]);
+  const [searchResults, setSearchResults] = useState([] as channelType[]);
   const [loadingSearchResults, setLoadingSearchResults] = useState(true);
 
   const profilePopoverRef = useRef<HTMLDivElement>(null);
@@ -47,23 +47,27 @@ function Header() {
         setSearchResults([
           {
             name: "group1",
-            id: "1234",
+            channelId: "1234",
             type: "group",
+            isOwner: true,
           },
           {
             name: "group2",
-            id: "12345",
+            channelId: "12345",
             type: "group",
+            isOwner: true,
           },
           {
             name: "user1",
-            id: "1236",
+            channelId: "1236",
             type: "user",
+            isOwner: true,
           },
           {
             name: "user2",
-            id: "1237",
+            channelId: "1237",
             type: "user",
+            isOwner: true,
           },
         ]);
       } catch (error) {
@@ -132,16 +136,16 @@ function Header() {
                 ) : (
                   <div className="results">
                     {searchResults.length > 0 ? (
-                      searchResults.map((room) => {
-                        if (room.type == "user") {
+                      searchResults.map((channel) => {
+                        if (channel.type == "user") {
                           return (
                             <Link
-                              to={`${room.type}/${room.id}`}
+                              to={`${channel.type}/${channel.channelId}`}
                               onClick={(e) => {
                                 if (e) setSearchTerm("");
                               }}
                             >
-                              {room.name}
+                              {channel.name}
                             </Link>
                           );
                         }
@@ -159,16 +163,16 @@ function Header() {
                 ) : (
                   <div className="results">
                     {searchResults.length > 0 ? (
-                      searchResults.map((room) => {
-                        if (room.type == "group") {
+                      searchResults.map((channel) => {
+                        if (channel.type == "group") {
                           return (
                             <Link
-                              to={`${room.type}/${room.id}`}
+                              to={`${channel.type}/${channel.channelId}`}
                               onClick={(e) => {
                                 if (e) setSearchTerm("");
                               }}
                             >
-                              {room.name}
+                              {channel.name}
                             </Link>
                           );
                         }

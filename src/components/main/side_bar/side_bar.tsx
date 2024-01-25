@@ -1,13 +1,14 @@
 import { useEffect, useState, useRef } from "react";
-import { roomType } from "../../../types/messages";
+import { channelType } from "../../../types/messages";
 
 import "./side_bar.css";
 import { Link, NavLink } from "react-router-dom";
 
 import useClickOutside from "../useClickOutside";
+import axios from "axios";
 
 function SideBar() {
-  const [roomList, setRoomList] = useState([] as roomType[]);
+  const [channelList, setChannelList] = useState([] as channelType[]);
   const [activeButton, setActiveButton] = useState(
     "all" as "all" | "user" | "group"
   );
@@ -24,30 +25,18 @@ function SideBar() {
   );
 
   useEffect(() => {
-    //API to get group list start in all groups
-    const roomList: roomType[] = [
-      {
-        type: "group",
-        name: "group1",
-        id: "1234",
-      },
-      {
-        type: "group",
-        name: "group2",
-        id: "1235",
-      },
-      {
-        type: "user",
-        name: "user1",
-        id: "1236",
-      },
-      {
-        type: "user",
-        name: "user2",
-        id: "1237",
-      },
-    ];
-    setRoomList(roomList);
+    const getChannels = async () => {
+      try {
+        const jwt = localStorage.getItem("auth");
+        const channelList = await axios.get("/api/Channel", {
+          headers: { Authorization: `Bearer ${jwt}` },
+        });
+        setChannelList(channelList.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getChannels();
   }, []);
 
   return (
@@ -78,7 +67,7 @@ function SideBar() {
           ) : undefined}
         </div>
       </div>
-      <div className="room-type-header">
+      <div className="channel-type-header">
         <button
           className={activeButton === "all" ? "active-btn" : "inactive-btn"}
           onClick={(e) => {
@@ -107,33 +96,35 @@ function SideBar() {
           Groups
         </button>
       </div>
-      <div className="rooms">
-        {roomList.length > 0
-          ? roomList.map((room) => {
+      <div className="channels">
+        {channelList.length > 0
+          ? channelList.map((channel) => {
               if (activeButton === "all") {
                 return (
                   <NavLink
-                    to={`${room.type}/${room.id}`}
-                    className="room"
-                    key={room.id}
+                    to={`${channel.type}/${channel.channelId}`}
+                    className="channel"
+                    key={channel.channelId}
                   >
-                    {room.name}
+                    {channel.type == "group"
+                      ? `# ${channel.name}`
+                      : channel.name}
                   </NavLink>
                 );
               }
-              if (activeButton === room.type) {
+              if (activeButton === channel.type) {
                 return (
                   <NavLink
-                    to={`${room.type}/${room.id}`}
-                    className="room"
-                    key={room.id}
+                    to={`${channel.type}/${channel.channelId}`}
+                    className="channel"
+                    key={channel.channelId}
                   >
-                    {room.name}
+                    {channel.name}
                   </NavLink>
                 );
               }
             })
-          : "No Rooms Found"}
+          : "No channels Found"}
       </div>
     </div>
   );
