@@ -27,10 +27,7 @@ function SideBar() {
   useEffect(() => {
     const getChannels = async () => {
       try {
-        const jwt = localStorage.getItem("auth");
-        const channelList = await axios.get("/api/Channel", {
-          headers: { Authorization: `Bearer ${jwt}` },
-        });
+        const channelList = await axios.get("/api/Channel");
         setChannelList(channelList.data);
       } catch (error) {
         console.log(error);

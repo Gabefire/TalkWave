@@ -1,14 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { loginErrorType } from "../../types/auth";
+import { useProvideAuth } from "../../useProvideAuth";
 
-interface mainPageType {
-  login: (user: {
-    email: string;
-    password: string;
-  }) => Promise<void | loginErrorType[]>;
-}
-
-export default function MainPage({ login }: mainPageType) {
+export default function MainPage() {
+  const { login } = useProvideAuth();
   const navigate = useNavigate();
 
   const loginTryMe = async () => {
@@ -16,8 +10,6 @@ export default function MainPage({ login }: mainPageType) {
       await login({ email: "test@test.com", password: "1234" });
     } catch (err) {
       console.error(err);
-    } finally {
-      navigate("/main");
     }
   };
 

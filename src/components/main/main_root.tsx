@@ -1,10 +1,11 @@
-import { createContext, useEffect, useState } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { createContext, useContext, useEffect, useState } from "react";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import "./main.css";
 import { messageQueryType } from "../../types/messages";
 
 import Header from "./header/header";
 import SideBar from "./side_bar/side_bar";
+import { AuthContext } from "../../authProvider";
 
 export const MessageQueryContext = createContext({
   name: "",
@@ -13,6 +14,12 @@ export const MessageQueryContext = createContext({
 
 function MainRoot() {
   const [messageQuery, setMessageQuery] = useState({} as messageQueryType);
+  const navigate = useNavigate();
+
+  const user = useContext(AuthContext);
+  if (!user.token) {
+    navigate("/login");
+  }
 
   const testParams = useParams();
 

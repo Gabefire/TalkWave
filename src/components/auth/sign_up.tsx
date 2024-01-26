@@ -2,19 +2,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { loginErrorType, signUpErrorType } from "../../types/auth";
-import { useNavigate } from "react-router-dom";
-
-interface signUpType {
-  login: (user: {
-    email: string;
-    password: string;
-  }) => Promise<void | loginErrorType[]>;
-  signUp: (user: {
-    userName: string;
-    email: string;
-    password: string;
-  }) => Promise<void | signUpErrorType[]>;
-}
+import { useProvideAuth } from "../../useProvideAuth";
 
 const signUpFormSchema = z
   .object({
@@ -32,7 +20,7 @@ const signUpFormSchema = z
 
 export type signUpFormSchemaType = z.infer<typeof signUpFormSchema>;
 
-const SignUp = ({ signUp, login }: signUpType) => {
+const SignUp = () => {
   const {
     register,
     handleSubmit,
@@ -42,7 +30,7 @@ const SignUp = ({ signUp, login }: signUpType) => {
     resolver: zodResolver(signUpFormSchema),
   });
 
-  const navigate = useNavigate();
+  const { signUp } = useProvideAuth();
 
   const validateResults = (results: signUpErrorType[] | loginErrorType[]) => {
     results.forEach((obj) => {
@@ -71,19 +59,9 @@ const SignUp = ({ signUp, login }: signUpType) => {
     const signUpResults = await signUp(user);
     if (signUpResults instanceof Array && signUpResults.length > 0) {
       validateResults(signUpResults);
-      return;
-    } else {
-      const loginResults = await login({
-        email: user.email,
-        password: user.password,
-      });
-      if (loginResults instanceof Array && loginResults.length > 0) {
-        validateResults(loginResults);
-        return;
-      }
-      navigate("/main");
     }
   };
+
   return (
     <form className="form" onSubmit={handleSubmit(onSubmit)}>
       <h1>Sign Up</h1>

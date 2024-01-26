@@ -1,15 +1,7 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { loginErrorType } from "../../types/auth";
-import { useNavigate } from "react-router-dom";
-
-interface loginType {
-  login: (user: {
-    email: string;
-    password: string;
-  }) => Promise<void | loginErrorType[]>;
-}
+import { useProvideAuth } from "../../useProvideAuth";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, "Email is required").max(100),
@@ -18,7 +10,7 @@ const loginFormSchema = z.object({
 
 type loginFormSchemaType = z.infer<typeof loginFormSchema>;
 
-function Login({ login }: loginType) {
+function Login() {
   const {
     register,
     handleSubmit,
@@ -26,7 +18,7 @@ function Login({ login }: loginType) {
     formState: { errors, isSubmitting },
   } = useForm<loginFormSchemaType>({ resolver: zodResolver(loginFormSchema) });
 
-  const navigate = useNavigate();
+  const { login } = useProvideAuth();
 
   const onSubmit: SubmitHandler<loginFormSchemaType> = async (user) => {
     const results = await login(user);
@@ -43,9 +35,6 @@ function Login({ login }: loginType) {
           setError("root.serverError", { type: "404", message: `${value}` });
         }
       });
-      return;
-    } else {
-      navigate("/main");
     }
   };
   return (

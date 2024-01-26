@@ -1,20 +1,37 @@
-export interface signUpUserType {
-  username: string;
+export type signUpUserType = {
+  userName: string;
   password: string;
-  confirmPassword: string;
-  email?: string;
+  passwordConfirmation: string;
+  email: string;
 }
 
-export interface loginErrorType {
-  username?: string;
+export type loginUserType = {
+  email: string;
+  password: string;
+}
+
+export type loginUserDtoType = {
+  userName: string;
+  token: string;
+}
+
+export type user = {
+  userName: string;
+  email: string;
+}
+
+export type loginErrorType = {
+  userName?: string;
   password?: string;
   root?: string;
 }
 
-export interface signUpErrorType {
-  username?: string;
+
+export type signUpErrorType = {
+  userName?: string;
   password?: string;
-  confirmPassword?: string;
+  passwordConfirmation?: string;
   email?: string;
   root?: string;
 }
+
