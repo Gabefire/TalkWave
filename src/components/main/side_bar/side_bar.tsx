@@ -27,7 +27,7 @@ function SideBar() {
   useEffect(() => {
     const getChannels = async () => {
       try {
-        const channelList = await axios.get("/api/Channel");
+        const channelList = await axios.get<channelType[]>("/api/Channel");
         setChannelList(channelList.data);
       } catch (error) {
         console.log(error);

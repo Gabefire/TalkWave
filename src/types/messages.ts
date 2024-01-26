@@ -17,9 +17,3 @@ export interface channelType {
   isOwner: boolean;
 }
 
-export interface messageResultType {
-  title: string;
-  type: "user" | "group" | null;
-  owner: boolean;
-  messages: messageType[];
-}

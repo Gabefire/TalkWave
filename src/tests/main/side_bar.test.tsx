@@ -5,11 +5,32 @@ import { MessageQueryContext } from "../../components/main/main_root";
 import { ReactElement } from "react";
 import SideBar from "../../components/main/side_bar/side_bar";
 import { BrowserRouter } from "react-router-dom";
-import { messageQueryType } from "../../types/messages";
+import { messageQueryType, messageType } from "../../types/messages";
 import { setupServer } from "msw/node";
 import { HttpResponse, http } from "msw";
 import { channelType } from "../../types/messages";
 import { act } from "react-dom/test-utils";
+
+const messageList: messageType[] = [
+  {
+    from: "gabe",
+    content: "Hi this is Gabe",
+    date: new Date(),
+    owner: true,
+  },
+  {
+    from: "ben",
+    content: "Hi this is ben",
+    date: new Date(),
+    owner: false,
+  },
+  {
+    from: "leah",
+    content: "Hi this is Leah",
+    date: new Date(),
+    owner: false,
+  },
+];
 
 const channelList: channelType[] = [
   {

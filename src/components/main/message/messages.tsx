@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { messageResultType, messageType } from "../../../types/messages";
+import { messageType } from "../../../types/messages";
 import { MessageQueryContext } from "../main_root";
-
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +8,9 @@ import { z } from "zod";
 import MessageBody from "./message_body";
 
 import "./messages.css";
+import { useParams } from "react-router-dom";
+
+import { AuthContext } from "../../../authProvider";
 
 // Types
 const sendMessageFormSchema = z.object({
@@ -29,63 +31,87 @@ function Messages() {
     resolver: zodResolver(sendMessageFormSchema),
   });
 
-  const messageQuery = useContext(MessageQueryContext);
-
-  const [messageResults, setMessageResults] = useState({} as messageResultType);
+  const [socket, setSocket] = useState(null as null | WebSocket);
+  const [isConnected, setIsConnected] = useState(false);
+  const [messageResults, setMessageResults] = useState([] as messageType[]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchMessageInfo = async () => {
-      try {
-        //fetch messages call
-        const results: messageResultType = {
-          title: "gabe",
-          type: "group",
-          owner: true,
-          messages: [
-            {
-              from: "gabe",
-              content: "Hi this is Gabe",
-              date: new Date(),
-              owner: true,
-            },
-            {
-              from: "ben",
-              content: "Hi this is ben",
-              date: new Date(),
-              owner: false,
-            },
-            {
-              from: "leah",
-              content: "Hi this is Leah",
-              date: new Date(),
-              owner: false,
-            },
-          ],
-        };
-        setMessageResults(results);
-        setIsLoading(false);
-      } catch (error) {
-        // to do better error handler probably to a different page
-        console.error(error);
-      }
-    };
-    if (!messageQuery.type) {
-      return;
-    }
-    fetchMessageInfo();
-  }, [messageQuery]);
+  const params = useParams();
 
-  const postMessage = async (message: string): Promise<void | messageType> => {
-    // API call to post message
-    try {
+  const user = useContext(AuthContext);
+
+  const messageQuery = useContext(MessageQueryContext);
+
+  useEffect(() => {
+    const socket = new WebSocket(
+      `${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message/${params.type}/${
+        params.id
+      }?authorization=${user.token}`
+    );
+    setSocket(socket);
+  }, [params, user.token]);
+
+  useEffect(() => {
+    const onConnect = () => {
+      setIsConnected(true);
+    };
+
+    const onDisconnect = () => {
+      setIsConnected(false);
+    };
+
+    const onMessageReceive = (message: messageType) => {
       console.log(message);
-      return {
-        from: "gabe",
-        content: message,
-        date: new Date(),
-        owner: true,
-      };
+      setMessageResults((previous) => [...previous, message]);
+    };
+
+    const handleErrors = (err: Event) => {
+      console.log(err);
+    };
+
+    socket?.addEventListener("open", (event) => {
+      onConnect();
+      console.log(event);
+    });
+
+    socket?.addEventListener("message", (event) => {
+      (event.data as Blob).text().then((resultString) => {
+        const result = JSON.parse(resultString);
+        onMessageReceive(result as messageType);
+      });
+    });
+
+    socket?.addEventListener("error", (event) => {
+      handleErrors(event);
+    });
+
+    socket?.addEventListener("close", () => {
+      onDisconnect();
+    });
+
+    return () => {
+      socket?.removeEventListener("open", () => {
+        onConnect();
+      });
+
+      socket?.removeEventListener("message", (event) => {
+        onMessageReceive(event.data);
+      });
+
+      socket?.removeEventListener("error", (event) => {
+        handleErrors(event);
+      });
+
+      socket?.removeEventListener("close", () => {
+        onDisconnect();
+      });
+    };
+  }, [socket]);
+
+  const postMessage = async (message: string): Promise<boolean | void> => {
+    try {
+      socket?.send(message);
+      return true;
     } catch (error) {
       // todo better error handler
       console.error(error);
@@ -97,15 +123,18 @@ function Messages() {
   const onSubmit: SubmitHandler<sendMessageFormSchemaType> = async ({
     message,
   }) => {
-    // POST message add message to array if success
+    setIsLoading(true);
     const results = await postMessage(message);
     if (results) {
-      setMessageResults((prev) => {
-        return {
-          ...prev,
-          messages: [...prev.messages, results],
-        };
-      });
+      setMessageResults((prev) => [
+        ...prev,
+        {
+          from: user.userName,
+          content: message,
+          date: new Date(),
+          owner: true,
+        } as messageType,
+      ]);
     }
     reset();
   };
