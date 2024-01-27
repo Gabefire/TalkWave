@@ -1,11 +1,12 @@
 /// <reference types="vite-plugin-svgr/client" />
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import useClickOutside from "../useClickOutside";
 import SearchIcon from "../../../assets/magnify.svg?react";
 import { channelType } from "../../../types/messages";
 
 import "./header.css";
+import { AuthContext } from "../../../authProvider";
 
 function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
@@ -18,6 +19,8 @@ function Header() {
   const profileBoxRef = useRef<HTMLDivElement>(null);
   const searchBarRef = useRef<HTMLInputElement>(null);
   const searchBoxRef = useRef<HTMLDivElement>(null);
+
+  const user = useContext(AuthContext);
 
   // profile drop down
   useClickOutside(
@@ -93,7 +96,7 @@ function Header() {
         >
           {/*Log in name and pic will need to go here when logic is added*/}
           <img className="profile-pic" src="./" alt="Profile" />
-          <div className="name">Gabe Underwood</div>
+          <div className="name">{user.userName}</div>
           {displayJoinGroupMenu ? (
             <div className="profile popover" ref={profilePopoverRef}>
               <div className="triangle"></div>

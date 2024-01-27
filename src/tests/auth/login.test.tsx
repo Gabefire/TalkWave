@@ -13,8 +13,7 @@ vi.mock("react-router-dom", () => ({
 
 describe("login component", () => {
   it("renders correct heading", () => {
-    const login = vi.fn();
-    render(<Login login={login} />);
+    render(<Login />);
 
     const header = screen.getByRole("heading", { name: "Login" });
 
@@ -25,7 +24,7 @@ describe("login component", () => {
     const login = vi.fn();
     const user = userEvent.setup();
 
-    render(<Login login={login} />);
+    render(<Login />);
 
     const username = screen.getByRole("textbox", {
       name: "email",
@@ -41,16 +40,13 @@ describe("login component", () => {
     expect(login).toBeCalled();
   });
   it("when fields are empty login should not run and required fields should be in document", async () => {
-    const login = vi.fn();
     const user = userEvent.setup();
 
-    render(<Login login={login} />);
+    render(<Login />);
 
     const button = screen.getByRole("button", { name: "Login" });
 
     await user.click(button);
-
-    expect(login).not.toBeCalled();
     expect(await screen.findByText(/Email is Required/i)).toBeVisible();
     expect(await screen.findByText(/Password is Required/i)).toBeVisible();
   });
@@ -60,7 +56,7 @@ describe("login component", () => {
       return [{ serverError: "test error" }];
     });
     const user = userEvent.setup();
-    render(<Login login={login} />);
+    render(<Login />);
 
     const username = screen.getByRole("textbox", {
       name: "email",

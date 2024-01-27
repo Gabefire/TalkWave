@@ -20,7 +20,7 @@ export const AuthContext = createContext({
 
 function AuthProvider({ children }: { children: ReactElement }) {
   const [token, setToken_] = useState(localStorage.getItem("auth"));
-  const [userName, setUserName_] = useState("");
+  const [userName, setUserName_] = useState(localStorage.getItem("userName"));
 
   const setToken = (newToken: string | null) => {
     setToken_(newToken);

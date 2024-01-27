@@ -39,25 +39,40 @@ export default function MessageBody({ messageResults }: messageBodyType) {
     });
   }, [messageResults]);
 
-  const deleteGroup = async () => {
-    // api call to delete message query
-    navigate("/main");
+  const deleteChannel = async () => {
+    try {
+      await axios.delete(`/api/Channel/${params.id}`);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      navigate("/main");
+    }
   };
 
-  const leaveGroup = async () => {
-    // api call to leave message query
-    navigate("/main");
+  const leaveChannel = async () => {
+    try {
+      if (params.type == "user") {
+        throw new Error("invalid operation");
+      } else {
+        await axios.put(`/api/GroupChannel/leave/${params.id}`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      navigate("/main");
+    }
   };
+
   return (
     <>
       <div className="messages-top-bar">
         <h2>{channel.name}</h2>
-        {channel.isOwner ? (
-          <button className="message-header-btn delete" onClick={deleteGroup}>
+        {channel.isOwner || params.type == "user" ? (
+          <button className="message-header-btn delete" onClick={deleteChannel}>
             Delete
           </button>
         ) : (
-          <button className="message-header-btn leave" onClick={leaveGroup}>
+          <button className="message-header-btn leave" onClick={leaveChannel}>
             Leave
           </button>
         )}

@@ -114,8 +114,16 @@ function Messages() {
 
       socket?.removeEventListener("message", (event) => {
         (event.data as Blob).text().then((resultString) => {
-          const result: messageType = JSON.parse(resultString);
-          setMessageResults((previous) => [...previous, result]);
+          const result: messageTypeDto = JSON.parse(resultString);
+
+          const message: messageType = {
+            isOwner: result.IsOwner,
+            author: result.Author,
+            content: result.Content,
+            createdAt: result.CreatedAt,
+          };
+
+          setMessageResults((previous) => [...previous, message]);
         });
       });
 
@@ -126,6 +134,8 @@ function Messages() {
       socket?.removeEventListener("close", () => {
         onDisconnect();
       });
+
+      socket?.close();
     };
   }, [socket]);
 
@@ -144,6 +154,7 @@ function Messages() {
   const onSubmit: SubmitHandler<sendMessageFormSchemaType> = async ({
     message,
   }) => {
+    // Might add a way to not get the websocket message here and just add it directly timing might be off though. Saves resources
     setIsLoading(true);
     await postMessage(message);
     setIsLoading(false);

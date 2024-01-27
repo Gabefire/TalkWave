@@ -116,7 +116,9 @@ function SideBar() {
                     className="channel"
                     key={channel.channelId}
                   >
-                    {channel.name}
+                    {channel.type === "group"
+                      ? `# ${channel.name}`
+                      : channel.name}
                   </NavLink>
                 );
               }

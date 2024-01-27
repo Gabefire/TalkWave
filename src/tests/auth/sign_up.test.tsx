@@ -14,9 +14,7 @@ vi.mock("react-router-dom", () => ({
 
 describe("sign up component", () => {
   it("renders correct heading", () => {
-    const login = vi.fn();
-    const signUp = vi.fn();
-    render(<SignUp login={login} signUp={signUp} />);
+    render(<SignUp />);
 
     const header = screen.getByRole("heading", { name: "Sign Up" });
 
@@ -24,18 +22,14 @@ describe("sign up component", () => {
   });
 
   it("when fields are empty sign up should not run and errors should display", async () => {
-    const signUp = vi.fn();
-    const login = vi.fn();
     const user = userEvent.setup();
 
-    render(<SignUp login={login} signUp={signUp} />);
+    render(<SignUp />);
 
     const button = screen.getByRole("button", { name: "Sign Up" });
 
     await user.click(button);
 
-    expect(signUp).not.toBeCalled();
-    expect(login).not.toBeCalled();
     expect(await screen.findByText(/Username is Required/i)).toBeVisible();
     expect(await screen.findByText(/Password is Required/i)).toBeVisible();
     expect(
@@ -48,7 +42,7 @@ describe("sign up component", () => {
     const signUp = vi.fn();
     const user = userEvent.setup();
 
-    render(<SignUp login={login} signUp={signUp} />);
+    render(<SignUp />);
 
     const username = screen.getByRole("textbox", {
       name: "username",
@@ -68,13 +62,12 @@ describe("sign up component", () => {
   });
 
   it("error should show if login api fails", async () => {
-    const signUp = vi.fn();
     const login = vi.fn().mockImplementation(() => {
       return [{ root: "test error" }];
     });
 
     const user = userEvent.setup();
-    render(<SignUp signUp={signUp} login={login} />);
+    render(<SignUp />);
 
     const username = screen.getByRole("textbox", {
       name: "username",
@@ -94,13 +87,8 @@ describe("sign up component", () => {
   });
 
   it("error should show if sign up api fails", async () => {
-    const login = vi.fn();
-    const signUp = vi.fn().mockImplementation(() => {
-      return [{ root: "test error" }];
-    });
-
     const user = userEvent.setup();
-    render(<SignUp signUp={signUp} login={login} />);
+    render(<SignUp />);
 
     const username = screen.getByRole("textbox", {
       name: "username",
@@ -114,8 +102,6 @@ describe("sign up component", () => {
     await user.type(password, "test");
     await user.type(passwordConfirmation, "test");
     await user.click(button);
-
-    expect(login).not.toHaveBeenCalled();
     expect(await screen.findByText(/test error/i)).toBeVisible();
   });
 });
