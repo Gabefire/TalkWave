@@ -1,13 +1,13 @@
 
 
-.root, .app {
+.root, .app, body{
   display: grid;
   grid-template-columns: minmax(300px, 580px) 1fr;
   background-color: black;
   color: white;
   overflow-x: hidden;
   overflow-y: hidden;
-  height: 100%;
+  height: 100vh;
 }
 
 .top-header {

@@ -1,9 +1,17 @@
 export interface messageType {
-  from: string;
+  author: string;
   content: string;
-  date: Date;
-  owner: boolean;
+  createdAt: string;
+  isOwner: boolean;
 }
+
+export interface messageTypeDto {
+  Author: string;
+  Content: string;
+  CreatedAt: string;
+  IsOwner: boolean;
+}
+
 
 export interface messageQueryType {
   name: string;

@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { messageType } from "../../../types/messages";
-import { MessageQueryContext } from "../main_root";
+import { messageType, messageTypeDto } from "../../../types/messages";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,6 +10,7 @@ import "./messages.css";
 import { useParams } from "react-router-dom";
 
 import { AuthContext } from "../../../authProvider";
+import axios from "axios";
 
 // Types
 const sendMessageFormSchema = z.object({
@@ -40,44 +40,62 @@ function Messages() {
 
   const user = useContext(AuthContext);
 
-  const messageQuery = useContext(MessageQueryContext);
-
   useEffect(() => {
-    const socket = new WebSocket(
-      `${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message/${params.type}/${
-        params.id
-      }?authorization=${user.token}`
-    );
-    setSocket(socket);
+    const connectWebsocket = async () => {
+      const socket = new WebSocket(
+        `${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message/${params.type}/${
+          params.id
+        }?authorization=${user.token}`
+      );
+      setSocket(socket);
+    };
+
+    const getMessages = async () => {
+      try {
+        const messages = await axios.get<messageType[]>(
+          `/api/Message/${params.id}`
+        );
+        setMessageResults(messages.data);
+        await connectWebsocket();
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getMessages();
   }, [params, user.token]);
 
   useEffect(() => {
     const onConnect = () => {
       setIsConnected(true);
+      setIsLoading(false);
     };
 
     const onDisconnect = () => {
       setIsConnected(false);
     };
 
-    const onMessageReceive = (message: messageType) => {
-      console.log(message);
-      setMessageResults((previous) => [...previous, message]);
-    };
-
     const handleErrors = (err: Event) => {
       console.log(err);
     };
 
-    socket?.addEventListener("open", (event) => {
+    socket?.addEventListener("open", () => {
       onConnect();
-      console.log(event);
     });
 
     socket?.addEventListener("message", (event) => {
       (event.data as Blob).text().then((resultString) => {
-        const result = JSON.parse(resultString);
-        onMessageReceive(result as messageType);
+        const result: messageTypeDto = JSON.parse(resultString);
+
+        const message: messageType = {
+          isOwner: result.IsOwner,
+          author: result.Author,
+          content: result.Content,
+          createdAt: result.CreatedAt,
+        };
+
+        setMessageResults((previous) => [...previous, message]);
       });
     });
 
@@ -95,7 +113,10 @@ function Messages() {
       });
 
       socket?.removeEventListener("message", (event) => {
-        onMessageReceive(event.data);
+        (event.data as Blob).text().then((resultString) => {
+          const result: messageType = JSON.parse(resultString);
+          setMessageResults((previous) => [...previous, result]);
+        });
       });
 
       socket?.removeEventListener("error", (event) => {
@@ -124,23 +145,13 @@ function Messages() {
     message,
   }) => {
     setIsLoading(true);
-    const results = await postMessage(message);
-    if (results) {
-      setMessageResults((prev) => [
-        ...prev,
-        {
-          from: user.userName,
-          content: message,
-          date: new Date(),
-          owner: true,
-        } as messageType,
-      ]);
-    }
+    await postMessage(message);
+    setIsLoading(false);
     reset();
   };
 
   // to do better no info comp
-  if (!messageQuery.name && !messageQuery.type) {
+  if (!params || !isConnected) {
     return (
       <>
         <div>No information</div>

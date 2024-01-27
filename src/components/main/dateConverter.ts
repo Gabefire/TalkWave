@@ -1,18 +1,13 @@
 import differenceInMinutes from "date-fns/differenceInMinutes";
 
-interface dateType {
-    seconds: number;
-    nanoseconds: number;
-  }
-
-export default function dateConverter(date: dateType | Date): string {
+export default function dateConverter(date: Date | string): string {
   const currentDate = new Date();
-  let dateParam;
+  let dateParam: Date
   if (!(date instanceof Date)) {
-    dateParam = new Date(date.seconds * 1000);
+    dateParam = new Date(date);
   } else {
-    dateParam = date;
-  }
+    dateParam = date; 
+  }  
   const diffMinutes = Math.abs(differenceInMinutes(currentDate, dateParam));
   if (diffMinutes >= 525600) {
     const years = Math.floor(diffMinutes / 525600);

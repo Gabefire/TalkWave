@@ -1,34 +1,58 @@
-import { useContext } from "react";
-import { messageResultType } from "../../../types/messages";
-import { MessageQueryContext } from "../main_root";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { channelType, messageType } from "../../../types/messages";
+import { useNavigate, useParams } from "react-router-dom";
 import dateConverter from "../dateConverter";
+import axios from "axios";
 
 interface messageBodyType {
-  messageResults: messageResultType;
+  messageResults: messageType[];
 }
 
 export default function MessageBody({ messageResults }: messageBodyType) {
-  const messageQuery = useContext(MessageQueryContext);
+  const [channel, setChannel] = useState({} as channelType);
 
   const navigate = useNavigate();
+
+  const params = useParams();
+
+  const dummy = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const getChannel = async () => {
+      try {
+        const channel = (
+          await axios.get<channelType>(`/api/Channel/${params.id}`)
+        ).data;
+        setChannel(channel);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getChannel();
+  }, [params]);
+
+  useEffect(() => {
+    dummy.current?.scrollIntoView({
+      behavior: "instant",
+      block: "nearest",
+      inline: "start",
+    });
+  }, [messageResults]);
 
   const deleteGroup = async () => {
     // api call to delete message query
     navigate("/main");
-    console.log(messageQuery);
   };
 
   const leaveGroup = async () => {
     // api call to leave message query
     navigate("/main");
-    console.log(messageQuery);
   };
   return (
     <>
       <div className="messages-top-bar">
-        <h2>{messageResults.title}</h2>
-        {messageResults.owner ? (
+        <h2>{channel.name}</h2>
+        {channel.isOwner ? (
           <button className="message-header-btn delete" onClick={deleteGroup}>
             Delete
           </button>
@@ -39,14 +63,14 @@ export default function MessageBody({ messageResults }: messageBodyType) {
         )}
       </div>
       <div className="main-message-content">
-        {messageResults.messages.length === 0
+        {messageResults.length === 0
           ? "No Messages Found"
-          : messageResults.messages.map((post, index) => {
+          : messageResults.map((post, index) => {
               return (
                 <div
                   className="message"
                   style={
-                    post.owner
+                    post.isOwner
                       ? {
                           textAlign: "end",
                           alignSelf: "flex-end",
@@ -62,7 +86,7 @@ export default function MessageBody({ messageResults }: messageBodyType) {
                   <div
                     className="message-header"
                     style={
-                      post.owner
+                      post.isOwner
                         ? {
                             justifyContent: "flex-end",
                           }
@@ -71,15 +95,16 @@ export default function MessageBody({ messageResults }: messageBodyType) {
                           }
                     }
                   >
-                    <div className="from">{post.from}</div>
+                    <div className="from">{post.author}</div>
                     <div className="date-posted">
-                      {dateConverter(post.date)}
+                      {dateConverter(post.createdAt)}
                     </div>
                   </div>
                   <p>{post.content}</p>
                 </div>
               );
             })}
+        <span ref={dummy}></span>
       </div>
     </>
   );
