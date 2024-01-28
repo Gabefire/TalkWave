@@ -1,89 +1,42 @@
 import { RenderOptions, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { MessageQueryContext } from "../../components/main/main_root";
 import { ReactElement } from "react";
 import SideBar from "../../components/main/side_bar/side_bar";
 import { BrowserRouter } from "react-router-dom";
-import { messageQueryType, messageType } from "../../types/messages";
-import { setupServer } from "msw/node";
-import { HttpResponse, http } from "msw";
-import { channelType } from "../../types/messages";
 import { act } from "react-dom/test-utils";
-
-const messageList: messageType[] = [
-  {
-    from: "gabe",
-    content: "Hi this is Gabe",
-    date: new Date(),
-    owner: true,
-  },
-  {
-    from: "ben",
-    content: "Hi this is ben",
-    date: new Date(),
-    owner: false,
-  },
-  {
-    from: "leah",
-    content: "Hi this is Leah",
-    date: new Date(),
-    owner: false,
-  },
-];
-
-const channelList: channelType[] = [
-  {
-    type: "group",
-    name: "group1",
-    channelId: "1234",
-    isOwner: true,
-  },
-  {
-    type: "group",
-    name: "group2",
-    channelId: "1235",
-    isOwner: true,
-  },
-  {
-    type: "user",
-    name: "user1",
-    channelId: "1236",
-    isOwner: true,
-  },
-  {
-    type: "user",
-    name: "user2",
-    channelId: "1237",
-    isOwner: true,
-  },
-];
-export const restHandler = [
-  http.get(`/api/Channel`, () => {
-    return HttpResponse.json(channelList);
-  }),
-];
-
-const server = setupServer(...restHandler);
+import { AuthContext } from "../../authProvider";
+import { authContextType } from "../../types/auth";
+import { vi } from "vitest";
 
 const customRender = (
   ui: ReactElement,
-  providerProps: messageQueryType,
+  providerProps: authContextType,
   renderOptions?: Omit<RenderOptions, "wrapper">
 ) => {
   return render(
-    <MessageQueryContext.Provider value={{ ...providerProps }}>
+    <AuthContext.Provider value={{ ...providerProps }}>
       {ui}
-    </MessageQueryContext.Provider>,
+    </AuthContext.Provider>,
     renderOptions
   );
 };
 
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useParams: () => vi.fn().mockReturnValue({ id: "1", type: "group" }),
+}));
 
-afterAll(() => server.close());
-
-afterEach(() => server.resetHandlers());
+const userContext: authContextType = {
+  userName: "test",
+  setUserName: (userName: string) => {
+    userName;
+  },
+  token: "123",
+  setToken: (token: string | null) => {
+    token;
+  },
+};
 
 describe("side bar component", () => {
   it("shows header", () => {
@@ -91,10 +44,7 @@ describe("side bar component", () => {
       <BrowserRouter>
         <SideBar />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
 
     expect(
@@ -108,10 +58,7 @@ describe("side bar component", () => {
         <BrowserRouter>
           <SideBar />
         </BrowserRouter>,
-        {
-          type: "group",
-          name: "gabe",
-        }
+        userContext
       );
     });
     const userButton = screen.getByText(/user1/);
@@ -126,10 +73,7 @@ describe("side bar component", () => {
       <BrowserRouter>
         <SideBar />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
     const dropDownBtn = screen.getByRole("button", { name: "+" });
 
@@ -143,10 +87,7 @@ describe("side bar component", () => {
       <BrowserRouter>
         <SideBar />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
     const dropDownBtn = screen.getByRole("button", { name: "+" });
 
@@ -168,10 +109,7 @@ describe("side bar component", () => {
       <BrowserRouter>
         <SideBar />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
     const dropDownBtn = screen.getByRole("button", { name: "+" });
 

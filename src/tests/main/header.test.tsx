@@ -1,24 +1,41 @@
 import { RenderOptions, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { MessageQueryContext } from "../../components/main/main_root";
 import { ReactElement } from "react";
 import Header from "../../components/main/header/header";
 import { BrowserRouter } from "react-router-dom";
-import { messageQueryType } from "../../types/messages";
+import { authContextType } from "../../types/auth";
+import { AuthContext } from "../../authProvider";
+import { vi } from "vitest";
 
 const customRender = (
   ui: ReactElement,
-  providerProps: messageQueryType,
+  providerProps: authContextType,
   renderOptions?: Omit<RenderOptions, "wrapper">
 ) => {
   return render(
-    <MessageQueryContext.Provider value={{ ...providerProps }}>
+    <AuthContext.Provider value={{ ...providerProps }}>
       {ui}
-    </MessageQueryContext.Provider>,
+    </AuthContext.Provider>,
     renderOptions
   );
 };
+
+const userContext: authContextType = {
+  userName: "test",
+  setUserName: (userName: string) => {
+    userName;
+  },
+  token: "123",
+  setToken: (token: string | null) => {
+    token;
+  },
+};
+
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useParams: () => vi.fn().mockReturnValue({ id: "1", type: "group" }),
+}));
 
 describe("header component", () => {
   it("Drop down menu profile controls disappear when clicking somewhere else in doc", async () => {
@@ -27,14 +44,11 @@ describe("header component", () => {
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
 
     // test will need to be changed when log in logic added
-    const dropDownBtn = screen.getByText("Gabe Underwood");
+    const dropDownBtn = screen.getByText("test");
 
     await user.click(dropDownBtn);
 
@@ -54,13 +68,10 @@ describe("header component", () => {
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
     // test will need to be changed when log in logic added
-    const dropDownBtn = screen.getByText("Gabe Underwood");
+    const dropDownBtn = screen.getByText("test");
 
     await user.click(dropDownBtn);
 
@@ -82,10 +93,7 @@ describe("header component", () => {
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
 
     const searchBar = screen.getByRole("searchbox");
@@ -103,10 +111,7 @@ describe("header component", () => {
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
-      {
-        type: "group",
-        name: "gabe",
-      }
+      userContext
     );
 
     const searchBar = screen.getByRole("searchbox");

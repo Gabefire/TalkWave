@@ -1,72 +1,110 @@
-import { RenderOptions, render, screen } from "@testing-library/react";
+import { RenderOptions, cleanup, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { MessageQueryContext } from "../../components/main/main_root";
 import { ReactElement } from "react";
-import { messageQueryType } from "../../types/messages";
 import Messages from "../../components/main/message/messages";
-
+import { authContextType } from "../../types/auth";
+import { AuthContext } from "../../authProvider";
 import { vi } from "vitest";
+import { act } from "react-dom/test-utils";
 
 const customRender = (
   ui: ReactElement,
-  providerProps: messageQueryType,
+  providerProps: authContextType,
   renderOptions?: Omit<RenderOptions, "wrapper">
 ) => {
   return render(
-    <MessageQueryContext.Provider value={{ ...providerProps }}>
+    <AuthContext.Provider value={{ ...providerProps }}>
       {ui}
-    </MessageQueryContext.Provider>,
+    </AuthContext.Provider>,
     renderOptions
   );
 };
 
-const mockedUsedNavigate = vi.fn();
+describe("Message Component", () => {
+  const userContext: authContextType = {
+    userName: "test",
+    setUserName: (userName: string) => {
+      userName;
+    },
+    token: "123",
+    setToken: (token: string | null) => {
+      token;
+    },
+  };
 
-vi.mock("react-router-dom", () => ({
-  ...vi.importActual("react-router-dom"),
-  useNavigate: () => mockedUsedNavigate,
-}));
+  const mock = vi.hoisted(() => {
+    return {
+      addEventListener: () => vi.fn(),
+      removeEventListener: () => vi.fn(),
+      close: () => vi.fn(),
+      send: () => vi.fn(),
+    };
+  });
 
-describe("message component", () => {
-  test("Messages show default text", () => {
-    render(<Messages />);
+  vi.mock("../../components/main/message/createWebsocket.ts", () => {
+    return {
+      default: vi.fn().mockResolvedValue(mock),
+    };
+  });
+
+  vi.mock("react-router-dom", () => ({
+    ...vi.importActual("react-router-dom"),
+    useNavigate: () => vi.fn(),
+    useParams: vi.fn().mockReturnValue({
+      id: "1",
+      type: "group",
+    }),
+  }));
+
+  window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
+  test("Messages show default text when not connected yet", async () => {
+    customRender(<Messages />, userContext);
+
     expect(screen.getByText(/No information/)).toBeInTheDocument();
   });
 
-  test("displays messages and title", () => {
-    customRender(<Messages />, {
-      type: "group",
-      name: "gabe",
-    });
+  test("Displays messages and title", async () => {
+    await act(async () => customRender(<Messages />, userContext));
 
-    expect(screen.getByRole("heading", { name: "gabe" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "test" })).toBeInTheDocument();
     expect(screen.getByText(/^Hi this is Leah/)).toBeInTheDocument();
   });
 
-  test("adding message includes div in documents", async () => {
-    const user = userEvent.setup();
-    customRender(<Messages />, {
-      type: "group",
-      name: "gabe",
-    });
+  test("Websocket events are added once created", async () => {
+    const spy = vi.spyOn(mock, "addEventListener");
+    await act(async () => customRender(<Messages />, userContext));
 
+    expect(spy).toHaveBeenCalled();
+  });
+
+  test("Websocket closes on unmount", async () => {
+    const spy = vi.spyOn(mock, "close");
+    await act(async () => customRender(<Messages />, userContext));
+    cleanup();
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  test("Pushing send sends message to websocket", async () => {
+    const spy = vi.spyOn(mock, "send");
+    await act(async () => customRender(<Messages />, userContext));
+
+    const user = userEvent.setup();
     const message = screen.getByRole("textbox", { name: "message" });
     const button = screen.getByRole("button", { name: "Send" });
 
     await user.type(message, "Hi how are you");
     await user.click(button);
 
-    expect(screen.getByText(/^Hi how are you/)).toBeInTheDocument();
+    expect(spy).toHaveBeenCalled();
   });
 
-  test("switches url when delete button is hit", async () => {
+  test("Switches url when delete button is hit", async () => {
+    await act(async () => customRender(<Messages />, userContext));
+
     const user = userEvent.setup();
-    const messageQ = {
-      type: "group",
-      name: "gabe",
-    } as messageQueryType;
-    customRender(<Messages />, messageQ);
     const button = screen.getByRole("button", { name: "Delete" });
 
     await user.click(button);

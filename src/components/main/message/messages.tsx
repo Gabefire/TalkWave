@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 
 import { AuthContext } from "../../../authProvider";
 import axios from "axios";
+import createWebsocket from "./createWebsocket";
 
 // Types
 const sendMessageFormSchema = z.object({
@@ -41,23 +42,24 @@ function Messages() {
   const user = useContext(AuthContext);
 
   useEffect(() => {
-    const connectWebsocket = async () => {
-      const socket = new WebSocket(
-        `${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message/${params.type}/${
-          params.id
-        }?authorization=${user.token}`
+    const setWebsocket = async () => {
+      const socket = await createWebsocket(
+        params.type as string,
+        params.id as string,
+        user.token as string
       );
       setSocket(socket);
     };
 
     const getMessages = async () => {
       try {
-        const messages = await axios.get<messageType[]>(
-          `/api/Message/${params.id}`
-        );
-        setMessageResults(messages.data);
-        await connectWebsocket();
+        const messages = (
+          await axios.get<messageType[]>(`/api/Message/${params.id}`)
+        ).data;
+        setMessageResults(messages);
         setIsLoading(false);
+        await setWebsocket();
+        setIsConnected(true);
       } catch (error) {
         console.log(error);
       }
@@ -106,7 +108,6 @@ function Messages() {
     socket?.addEventListener("close", () => {
       onDisconnect();
     });
-
     return () => {
       socket?.removeEventListener("open", () => {
         onConnect();
@@ -154,7 +155,7 @@ function Messages() {
   const onSubmit: SubmitHandler<sendMessageFormSchemaType> = async ({
     message,
   }) => {
-    // Might add a way to not get the websocket message here and just add it directly timing might be off though. Saves resources
+    // Might add a way to not get the websocket message here and just add it directly. timing might be off. Saves resources
     setIsLoading(true);
     await postMessage(message);
     setIsLoading(false);

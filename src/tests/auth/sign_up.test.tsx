@@ -83,7 +83,7 @@ describe("sign up component", () => {
     await user.click(button);
 
     expect(login).toBeCalled();
-    expect(await screen.findByText(/test error/i)).toBeVisible();
+    expect(await screen.findByText(/Something went wrong/i)).toBeVisible();
   });
 
   it("error should show if sign up api fails", async () => {
@@ -102,6 +102,6 @@ describe("sign up component", () => {
     await user.type(password, "test");
     await user.type(passwordConfirmation, "test");
     await user.click(button);
-    expect(await screen.findByText(/test error/i)).toBeVisible();
+    expect(await screen.findByText(/Something went wrong/i)).toBeVisible();
   });
 });

@@ -26,12 +26,18 @@ export type loginErrorType = {
   root?: string;
 }
 
-
 export type signUpErrorType = {
   userName?: string;
   password?: string;
   passwordConfirmation?: string;
   email?: string;
   root?: string;
+}
+
+export type authContextType = {
+  userName: string | null,
+  setUserName: (userName: string) => void
+  token: string | null,
+  setToken: (token: string | null) => void 
 }
 
