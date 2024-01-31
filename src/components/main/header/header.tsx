@@ -3,16 +3,23 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import useClickOutside from "../useClickOutside";
 import SearchIcon from "../../../assets/magnify.svg?react";
-import { channelType } from "../../../types/messages";
-
+import { channelType, userSearchDto } from "../../../types/messages";
 import "./header.css";
 import { AuthContext } from "../../../authProvider";
+import axios from "axios";
+import UserIcon from "./user_icon";
+import useProvideAuth from "../../../useProvideAuth";
 
 function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
   const [displaySearchBox, setDisplaySearchBox] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([] as channelType[]);
+  const [groupSearchResults, setGroupSearchResults] = useState(
+    [] as channelType[]
+  );
+  const [userSearchResults, setUserSearchResults] = useState(
+    [] as userSearchDto[]
+  );
   const [loadingSearchResults, setLoadingSearchResults] = useState(true);
 
   const profilePopoverRef = useRef<HTMLDivElement>(null);
@@ -21,6 +28,8 @@ function Header() {
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
   const user = useContext(AuthContext);
+
+  const { logout } = useProvideAuth();
 
   // profile drop down
   useClickOutside(
@@ -43,47 +52,39 @@ function Header() {
 
   //useEffect search logic
   useEffect(() => {
-    const getSearchResults = async (search: string) => {
+    const getSearchResults = async () => {
       try {
-        //Fetch here to get items search from back end
-        console.log(search);
-        setSearchResults([
-          {
-            name: "group1",
-            channelId: "1234",
-            type: "group",
-            isOwner: true,
-          },
-          {
-            name: "group2",
-            channelId: "12345",
-            type: "group",
-            isOwner: true,
-          },
-          {
-            name: "user1",
-            channelId: "1236",
-            type: "user",
-            isOwner: true,
-          },
-          {
-            name: "user2",
-            channelId: "1237",
-            type: "user",
-            isOwner: true,
-          },
+        const results = await Promise.all([
+          (
+            await axios.get<channelType[]>(`/api/GroupChannel/${searchTerm}`)
+          ).data,
+          (await axios.get<userSearchDto[]>(`/api/User/${searchTerm}`)).data,
         ]);
-      } catch (error) {
-        return;
+        setGroupSearchResults(results[0]);
+        setUserSearchResults(results[1]);
+      } catch (err) {
+        console.log(err);
       }
     };
     if (!searchTerm) {
       setDisplaySearchBox(false);
       return;
     }
-    getSearchResults(searchTerm);
+    const timeoutId = setTimeout(getSearchResults, 2000);
     setLoadingSearchResults(false);
+    return () => {
+      clearTimeout(timeoutId);
+      setLoadingSearchResults(true);
+    };
   }, [searchTerm]);
+
+  const joinGroupChannel = async (channelId: string) => {
+    try {
+      await axios.put(`/api/GroupChannel/join/${channelId}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="top-header">
@@ -94,7 +95,7 @@ function Header() {
           className="user-field"
           onClick={() => setDisplayJoinGroupMenu(!displayJoinGroupMenu)}
         >
-          {/*Log in name and pic will need to go here when logic is added*/}
+          {/*Log in pic will need to go here when logic is added*/}
           <img className="profile-pic" src="./" alt="Profile" />
           <div className="name">{user.userName}</div>
           {displayJoinGroupMenu ? (
@@ -103,7 +104,7 @@ function Header() {
               <Link to={"/edit-profile"} className="popover-item">
                 Edit Profile
               </Link>
-              <Link to={"/"} className="popover-item">
+              <Link to={"/"} className="popover-item" onClick={logout}>
                 Logout
               </Link>
             </div>
@@ -111,6 +112,7 @@ function Header() {
         </div>
       </div>
       <div className="right-header">
+        {/*Search bar*/}
         <div className="search-container">
           <input
             type="search"
@@ -138,20 +140,9 @@ function Header() {
                   <div className="load">Loading...</div>
                 ) : (
                   <div className="results">
-                    {searchResults.length > 0 ? (
-                      searchResults.map((channel) => {
-                        if (channel.type == "user") {
-                          return (
-                            <Link
-                              to={`${channel.type}/${channel.channelId}`}
-                              onClick={(e) => {
-                                if (e) setSearchTerm("");
-                              }}
-                            >
-                              {channel.name}
-                            </Link>
-                          );
-                        }
+                    {userSearchResults.length > 0 ? (
+                      userSearchResults.map((user) => {
+                        return <UserIcon user={user} />;
                       })
                     ) : (
                       <div className="no-results">No Results</div>
@@ -165,17 +156,18 @@ function Header() {
                   <div className="load">Loading...</div>
                 ) : (
                   <div className="results">
-                    {searchResults.length > 0 ? (
-                      searchResults.map((channel) => {
+                    {groupSearchResults.length > 0 ? (
+                      groupSearchResults.map((channel) => {
                         if (channel.type == "group") {
                           return (
                             <Link
                               to={`${channel.type}/${channel.channelId}`}
-                              onClick={(e) => {
+                              onClick={async (e) => {
+                                await joinGroupChannel(channel.channelId);
                                 if (e) setSearchTerm("");
                               }}
                             >
-                              {channel.name}
+                              {`# ${channel.name}`}
                             </Link>
                           );
                         }

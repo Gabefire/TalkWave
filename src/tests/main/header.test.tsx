@@ -4,8 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { ReactElement } from "react";
 import Header from "../../components/main/header/header";
 import { BrowserRouter } from "react-router-dom";
-import { authContextType } from "../../types/auth";
 import { AuthContext } from "../../authProvider";
+import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
 
 const customRender = (
@@ -23,7 +23,7 @@ const customRender = (
 
 const userContext: authContextType = {
   userName: "test",
-  setUserName: (userName: string) => {
+  setUserName: (userName: string | null) => {
     userName;
   },
   token: "123",

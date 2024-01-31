@@ -22,14 +22,17 @@ const customRender = (
   );
 };
 
-vi.mock("react-router-dom", () => ({
-  ...vi.importActual("react-router-dom"),
-  useParams: () => vi.fn().mockReturnValue({ id: "1", type: "group" }),
-}));
+vi.mock("react-router-dom", async () => {
+  const actual: [] = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useParams: () => vi.fn().mockReturnValue({ id: "1", type: "group" }),
+  };
+});
 
 const userContext: authContextType = {
   userName: "test",
-  setUserName: (userName: string) => {
+  setUserName: (userName: string | null) => {
     userName;
   },
   token: "123",
@@ -40,12 +43,7 @@ const userContext: authContextType = {
 
 describe("side bar component", () => {
   it("shows header", () => {
-    customRender(
-      <BrowserRouter>
-        <SideBar />
-      </BrowserRouter>,
-      userContext
-    );
+    customRender(<SideBar />, userContext);
 
     expect(
       screen.getByRole("heading", { name: "Messaging" })

@@ -4,7 +4,7 @@
     align-items: center;
     width: 100vw;
     gap: 10px;
-    padding-top: 20px;
+    padding-top: 10px;
 }
 
 .top-header h3 {
@@ -49,7 +49,7 @@
     display: flex;
     position: relative;
     align-items: center;
-    background-color: rgb(90, 90, 90);
+    background-image: linear-gradient(to right, rgb(67, 104, 130), rgb(62,86, 106));
     border-radius: 7px;
     height: 32px;
     padding-left: 10px;
@@ -65,7 +65,7 @@
     color: white;
     font-family: inherit;
     font-size: 1rem;
-    background-color: rgb(90, 90, 90);
+    background-color: transparent;
     border: none;
 }
 
@@ -83,18 +83,19 @@
 
 .search-box {
     position: absolute;
-    top: 25px;
+    top: 27px;
     left: 0;
     width: 100%;
+    background-image: linear-gradient(to right, rgb(67, 104, 130), rgb(62,86, 106));
     /* top right bottom left */
     padding: 0 0 10px 10px;
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
+    border-radius: 0 0 5px 5px;
 }
 
 .search-box h5 {
     padding: 0;
-    color: rgb(218, 218, 218, 0.4);
+    font-size: 1rem;
+    color: rgb(218, 218, 218, 0.6);
     margin-top: 10px;
     margin-bottom: 10px;
 }

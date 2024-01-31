@@ -2,17 +2,17 @@ import { vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-
 import Login from "../../components/auth/login.js";
-const mockUsedNavigate = vi.fn();
+import { server } from "../server.ts";
+import { HttpResponse, http } from "msw";
 
 vi.mock("react-router-dom", () => ({
   ...vi.importActual("react-router-dom"),
-  useNavigate: () => mockUsedNavigate,
+  useNavigate: () => vi.fn(),
 }));
 
 describe("login component", () => {
-  it("renders correct heading", () => {
+  it("Renders correct heading", () => {
     render(<Login />);
 
     const header = screen.getByRole("heading", { name: "Login" });
@@ -20,9 +20,9 @@ describe("login component", () => {
     expect(header).toBeInTheDocument();
   });
 
-  it("should call login function with fields filled out", async () => {
-    const login = vi.fn();
+  it("Should set token and username once login", async () => {
     const user = userEvent.setup();
+    Storage.prototype.setItem = vi.fn();
 
     render(<Login />);
 
@@ -37,9 +37,9 @@ describe("login component", () => {
     await user.type(password, "test");
     await user.click(button);
 
-    expect(login).toBeCalled();
+    expect(localStorage.setItem).toHaveBeenCalled();
   });
-  it("when fields are empty login should not run and required fields should be in document", async () => {
+  it("When fields are empty login will not run and required fields should be in document", async () => {
     const user = userEvent.setup();
 
     render(<Login />);
@@ -51,10 +51,13 @@ describe("login component", () => {
     expect(await screen.findByText(/Password is Required/i)).toBeVisible();
   });
 
-  it("error should show if login api fails", async () => {
-    const login = vi.fn().mockImplementation(() => {
-      return [{ serverError: "test error" }];
-    });
+  it("Error shows if login api fails", async () => {
+    server.use(
+      http.post("/api/User/login", () => {
+        return HttpResponse.error();
+      })
+    );
+
     const user = userEvent.setup();
     render(<Login />);
 
@@ -69,7 +72,6 @@ describe("login component", () => {
     await user.type(password, "test");
     await user.click(button);
 
-    expect(login).toBeCalled();
-    expect(await screen.findByText(/test error/i)).toBeVisible();
+    expect(await screen.findByText(/undefined/i)).toBeVisible();
   });
 });

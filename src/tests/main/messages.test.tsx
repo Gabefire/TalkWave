@@ -24,7 +24,7 @@ const customRender = (
 describe("Message Component", () => {
   const userContext: authContextType = {
     userName: "test",
-    setUserName: (userName: string) => {
+    setUserName: (userName: string | null) => {
       userName;
     },
     token: "123",

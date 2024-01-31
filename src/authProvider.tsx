@@ -1,4 +1,5 @@
 import axios from "axios";
+import "react";
 import {
   ReactElement,
   createContext,
@@ -10,7 +11,7 @@ import { authContextType } from "./types/auth";
 
 export const AuthContext: React.Context<authContextType> = createContext({
   userName: null as string | null,
-  setUserName: (userName: string): void => {
+  setUserName: (userName: string | null): void => {
     userName;
   },
   token: null as string | null,
@@ -27,7 +28,7 @@ function AuthProvider({ children }: { children: ReactElement }) {
     setToken_(newToken);
   };
 
-  const setUserName = (userName: string) => {
+  const setUserName = (userName: string | null) => {
     setUserName_(userName);
   };
 

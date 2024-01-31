@@ -12,6 +12,7 @@ import Messages from "./components/main/message/messages.tsx";
 import CreateGroup from "./components/main/message/create_group.tsx";
 import axios from "axios";
 import AuthProvider from "./authProvider.tsx";
+import Welcome from "./components/main/message/welcome.tsx";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
     path: "/main",
     element: <MainRoot />,
     children: [
+      { index: true, element: <Welcome /> },
       { path: ":type/:id", element: <Messages /> },
       { path: "create-group", element: <CreateGroup /> },
     ],
@@ -37,9 +39,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
-  </React.StrictMode>
+  <AuthProvider>
+    <RouterProvider router={router} />
+  </AuthProvider>
 );

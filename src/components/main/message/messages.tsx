@@ -1,5 +1,9 @@
-import { useContext, useEffect, useState } from "react";
-import { messageType, messageTypeDto } from "../../../types/messages";
+import { useContext, useEffect, useRef, useState } from "react";
+import {
+  channelType,
+  messageType,
+  messageTypeDto,
+} from "../../../types/messages";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,7 +11,7 @@ import { z } from "zod";
 import MessageBody from "./message_body";
 
 import "./messages.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { AuthContext } from "../../../authProvider";
 import axios from "axios";
@@ -31,89 +35,41 @@ function Messages() {
   } = useForm<sendMessageFormSchemaType>({
     resolver: zodResolver(sendMessageFormSchema),
   });
-
-  const [socket, setSocket] = useState(null as null | WebSocket);
+  const socket = useRef(null as null | WebSocket);
   const [isConnected, setIsConnected] = useState(false);
   const [messageResults, setMessageResults] = useState([] as messageType[]);
   const [isLoading, setIsLoading] = useState(true);
+  const [channel, setChannel] = useState({} as channelType);
+
+  const navigate = useNavigate();
 
   const params = useParams();
-
   const user = useContext(AuthContext);
-
   useEffect(() => {
-    const setWebsocket = async () => {
-      const socket = await createWebsocket(
+    const setUpWebSocket = () => {
+      socket.current = createWebsocket(
         params.type as string,
         params.id as string,
         user.token as string
       );
-      setSocket(socket);
-    };
-
-    const getMessages = async () => {
-      try {
-        const messages = (
-          await axios.get<messageType[]>(`/api/Message/${params.id}`)
-        ).data;
-        setMessageResults(messages);
-        setIsLoading(false);
-        await setWebsocket();
+      let intervalId: number;
+      socket.current.onopen = () => {
         setIsConnected(true);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getMessages();
-  }, [params, user.token]);
-
-  useEffect(() => {
-    const onConnect = () => {
-      setIsConnected(true);
-      setIsLoading(false);
-    };
-
-    const onDisconnect = () => {
-      setIsConnected(false);
-    };
-
-    const handleErrors = (err: Event) => {
-      console.log(err);
-    };
-
-    socket?.addEventListener("open", () => {
-      onConnect();
-    });
-
-    socket?.addEventListener("message", (event) => {
-      (event.data as Blob).text().then((resultString) => {
-        const result: messageTypeDto = JSON.parse(resultString);
-
-        const message: messageType = {
-          isOwner: result.IsOwner,
-          author: result.Author,
-          content: result.Content,
-          createdAt: result.CreatedAt,
-        };
-
-        setMessageResults((previous) => [...previous, message]);
-      });
-    });
-
-    socket?.addEventListener("error", (event) => {
-      handleErrors(event);
-    });
-
-    socket?.addEventListener("close", () => {
-      onDisconnect();
-    });
-    return () => {
-      socket?.removeEventListener("open", () => {
-        onConnect();
-      });
-
-      socket?.removeEventListener("message", (event) => {
+        intervalId = setInterval(
+          () => socket.current?.send(""),
+          30000
+        ) as unknown as number;
+      };
+      socket.current.onclose = () => {
+        clearInterval(intervalId);
+        setIsConnected(false);
+      };
+      socket.current.onerror = () => {
+        setIsConnected(false);
+        socket.current?.close();
+        socket.current = null;
+      };
+      socket.current.onmessage = (event) => {
         (event.data as Blob).text().then((resultString) => {
           const result: messageTypeDto = JSON.parse(resultString);
 
@@ -123,32 +79,65 @@ function Messages() {
             content: result.Content,
             createdAt: result.CreatedAt,
           };
-
           setMessageResults((previous) => [...previous, message]);
         });
-      });
-
-      socket?.removeEventListener("error", (event) => {
-        handleErrors(event);
-      });
-
-      socket?.removeEventListener("close", () => {
-        onDisconnect();
-      });
-
-      socket?.close();
+      };
     };
-  }, [socket]);
+
+    const setUpChannel = async () => {
+      try {
+        const results = await Promise.all([
+          (await axios.get<messageType[]>(`/api/Message/${params.id}`)).data,
+          (await axios.get<channelType>(`/api/Channel/${params.id}`)).data,
+        ]);
+
+        setChannel(results[1]);
+        setMessageResults(results[0]);
+        setUpWebSocket();
+        setTimeout(() => setIsLoading(false), 500);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    setIsLoading(true);
+    setUpChannel();
+
+    return () => {
+      socket.current?.close();
+    };
+  }, [params, user.token]);
 
   const postMessage = async (message: string): Promise<boolean | void> => {
     try {
-      socket?.send(message);
-      return true;
+      socket.current?.send(message);
+      setIsLoading(false);
     } catch (error) {
       // todo better error handler
       console.error(error);
+    }
+  };
+
+  const deleteChannel = async () => {
+    try {
+      await axios.delete(`/api/Channel/${params.id}`);
+    } catch (err) {
+      console.error(err);
     } finally {
-      setFocus("message");
+      navigate("/main");
+    }
+  };
+
+  const leaveChannel = async () => {
+    try {
+      if (params.type == "user") {
+        throw new Error("invalid operation");
+      } else {
+        await axios.put(`/api/GroupChannel/leave/${params.id}`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      navigate("/main");
     }
   };
 
@@ -158,46 +147,65 @@ function Messages() {
     // Might add a way to not get the websocket message here and just add it directly. timing might be off. Saves resources
     setIsLoading(true);
     await postMessage(message);
-    setIsLoading(false);
+
+    setFocus("message");
     reset();
   };
 
   // to do better no info comp
-  if (!params || !isConnected) {
+  if (!params && !isConnected) {
     return (
       <>
-        <div>No information</div>
+        <div>Bad Connection</div>
       </>
     );
   }
 
   return (
-    <>
-      <div className="message-body">
-        {isLoading ? (
-          <div>No Messages Found</div>
-        ) : (
+    <div className="message-body">
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <div className="messages-top-bar">
+            <h2>{channel.name}</h2>
+            {channel.isOwner || params.type == "user" ? (
+              <button
+                className="message-header-btn delete"
+                onClick={deleteChannel}
+              >
+                Delete
+              </button>
+            ) : (
+              <button
+                className="message-header-btn leave"
+                onClick={leaveChannel}
+              >
+                Leave
+              </button>
+            )}
+          </div>
           <MessageBody messageResults={messageResults} />
-        )}
-      </div>
-      <form className="send-message" onSubmit={handleSubmit(onSubmit)}>
-        <textarea
-          aria-label="message"
-          rows={4}
-          cols={50}
-          className="message-input"
-          id="message-input"
-          {...register("message")}
-        />
-        <button
-          type="submit"
-          className="submit-message-btn"
-          disabled={isSubmitting}
-        >
-          Send
-        </button>
-      </form>
-    </>
+          <form className="send-message" onSubmit={handleSubmit(onSubmit)}>
+            <textarea
+              aria-label="message"
+              rows={4}
+              cols={50}
+              className="message-input"
+              id="message-input"
+              {...register("message")}
+            />
+            <button
+              type="submit"
+              className="submit-message-btn"
+              disabled={isSubmitting}
+            >
+              Send
+            </button>
+          </form>
+        </>
+      )}
+    </div>
   );
 }
 

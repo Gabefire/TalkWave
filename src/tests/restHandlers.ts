@@ -1,3 +1,4 @@
+import { loginUserDtoType } from "../types/auth";
 import { channelType, messageType } from "../types/messages";
 import { HttpResponse, http } from "msw";
 
@@ -55,6 +56,26 @@ const channel: channelType = {
     channelId: "1",
     isOwner: true,
   }
+
+const userDto: loginUserDtoType = {
+    userName: "test",
+    token: "1"
+}
+
+const groupSearchResults: channelType[] =[
+    {
+        name: "group1",
+        channelId: "1234",
+        type: "group",
+        isOwner: true,
+      },
+      {
+        name: "group2",
+        channelId: "12345",
+        type: "group",
+        isOwner: true,
+      },
+]
   
 
 const restHandler = [
@@ -73,6 +94,12 @@ const restHandler = [
     }),
     http.delete("/api/Channel/*", () => {
         return HttpResponse.text()
+    }),
+    http.post("/api/User/login", () => {
+        return HttpResponse.json(userDto)
+    }),
+    http.post("/api/User/register", () => {
+        return HttpResponse.text("test")
     })
   ];
 

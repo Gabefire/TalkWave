@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { loginErrorType, signUpErrorType } from "../../types/auth";
-import { useProvideAuth } from "../../useProvideAuth";
+import useProvideAuth from "../../useProvideAuth";
 
 const signUpFormSchema = z
   .object({
@@ -43,7 +43,7 @@ const SignUp = () => {
       } else if (key == "email") {
         setError("email", { type: "manual", message: `${value}` });
       } else if (key === "root") {
-        setError("root.serverError", { type: "manual", message: `${value}` });
+        setError("root.serverError", { type: "404", message: `${value}` });
       } else if (key === "passwordConfirmation") {
         setError("passwordConfirmation", {
           type: "manual",

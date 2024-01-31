@@ -23,5 +23,11 @@ export interface channelType {
   type: "user" | "group";
   channelId: string;
   isOwner: boolean;
+  channelPicLink?: string 
 }
 
+export interface userSearchDto   {
+  userId: number,
+  userName: string,
+  profilePicLink: string
+}

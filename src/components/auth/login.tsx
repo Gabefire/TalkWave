@@ -1,7 +1,7 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useProvideAuth } from "../../useProvideAuth";
+import useProvideAuth from "../../useProvideAuth";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, "Email is required").max(100),
@@ -22,7 +22,6 @@ function Login() {
 
   const onSubmit: SubmitHandler<loginFormSchemaType> = async (user) => {
     const results = await login(user);
-
     if (results instanceof Array) {
       results.forEach((obj) => {
         const key = Object.keys(obj)[0];
@@ -31,7 +30,7 @@ function Login() {
           setError("email", { type: "manual", message: `${value}` });
         } else if (key === "password") {
           setError("password", { type: "manual", message: `${value}` });
-        } else if (key === "serverError") {
+        } else if (key === "root") {
           setError("root.serverError", { type: "404", message: `${value}` });
         }
       });

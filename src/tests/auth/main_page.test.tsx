@@ -14,9 +14,7 @@ vi.mock("react-router-dom", () => ({
 
 describe("Main page component", () => {
   it("header is present", () => {
-    const login = vi.fn();
-
-    render(<MainPage login={login} />);
+    render(<MainPage />);
 
     const header = screen.getByRole("heading", { name: "Welcome to TalkWave" });
 

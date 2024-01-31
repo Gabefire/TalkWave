@@ -36,7 +36,7 @@ export type signUpErrorType = {
 
 export type authContextType = {
   userName: string | null,
-  setUserName: (userName: string) => void
+  setUserName: (userName: string| null) => void
   token: string | null,
   setToken: (token: string | null) => void 
 }

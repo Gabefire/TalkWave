@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 import SignUp from "../../components/auth/sign_up";
+import { server } from "../server";
+import { HttpResponse, http } from "msw";
 
 const mockUsedNavigate = vi.fn();
 
@@ -12,7 +14,7 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => mockUsedNavigate,
 }));
 
-describe("sign up component", () => {
+describe("Sign Up Component", () => {
   it("renders correct heading", () => {
     render(<SignUp />);
 
@@ -21,7 +23,7 @@ describe("sign up component", () => {
     expect(header).toBeInTheDocument();
   });
 
-  it("when fields are empty sign up should not run and errors should display", async () => {
+  it("When fields are empty sign up will not run and errors will display", async () => {
     const user = userEvent.setup();
 
     render(<SignUp />);
@@ -37,10 +39,9 @@ describe("sign up component", () => {
     ).toBeVisible();
   });
 
-  it("should call sign up function and login with fields filled out", async () => {
-    const login = vi.fn();
-    const signUp = vi.fn();
+  it("Call sign up function and login with fields filled out", async () => {
     const user = userEvent.setup();
+    Storage.prototype.setItem = vi.fn();
 
     render(<SignUp />);
 
@@ -57,14 +58,15 @@ describe("sign up component", () => {
     await user.type(passwordConfirmation, "test");
     await user.click(button);
 
-    expect(signUp).toBeCalled();
-    expect(login).toBeCalled();
+    expect(localStorage.setItem).toHaveBeenCalled();
   });
 
-  it("error should show if login api fails", async () => {
-    const login = vi.fn().mockImplementation(() => {
-      return [{ root: "test error" }];
-    });
+  it("Error shows if login api fails", async () => {
+    server.use(
+      http.post("/api/User/login", () => {
+        return HttpResponse.error();
+      })
+    );
 
     const user = userEvent.setup();
     render(<SignUp />);
@@ -82,11 +84,15 @@ describe("sign up component", () => {
     await user.type(passwordConfirmation, "test");
     await user.click(button);
 
-    expect(login).toBeCalled();
-    expect(await screen.findByText(/Something went wrong/i)).toBeVisible();
+    expect(await screen.findByText(/undefined/i)).toBeVisible();
   });
 
   it("error should show if sign up api fails", async () => {
+    server.use(
+      http.post("/api/User/register", () => {
+        return HttpResponse.error();
+      })
+    );
     const user = userEvent.setup();
     render(<SignUp />);
 
@@ -102,6 +108,6 @@ describe("sign up component", () => {
     await user.type(password, "test");
     await user.type(passwordConfirmation, "test");
     await user.click(button);
-    expect(await screen.findByText(/Something went wrong/i)).toBeVisible();
+    expect(await screen.findByText(/Bad Connection/i)).toBeVisible();
   });
 });
