@@ -11,7 +11,7 @@ import AuthRoot from "./components/auth/auth_root.tsx";
 import Messages from "./components/main/message/messages.tsx";
 import CreateGroup from "./components/main/message/create_group.tsx";
 import axios from "axios";
-import AuthProvider from "./authProvider.tsx";
+import AuthProvider from "./contexts/authProvider.tsx";
 import Welcome from "./components/main/message/welcome.tsx";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;

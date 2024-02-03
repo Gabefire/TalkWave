@@ -4,9 +4,10 @@ import userEvent from "@testing-library/user-event";
 import { ReactElement } from "react";
 import Messages from "../../components/main/message/messages";
 import { authContextType } from "../../types/auth";
-import { AuthContext } from "../../authProvider";
+import { AuthContext } from "../../contexts/authProvider";
 import { vi } from "vitest";
 import { act } from "react-dom/test-utils";
+import createWebsocket from "../../components/main/message/createWebsocket";
 
 const customRender = (
   ui: ReactElement,
@@ -33,63 +34,83 @@ describe("Message Component", () => {
     },
   };
 
-  const mock = vi.hoisted(() => {
+  const mockWebsocket = vi.hoisted(() => {
     return {
       addEventListener: () => vi.fn(),
       removeEventListener: () => vi.fn(),
       close: () => vi.fn(),
       send: () => vi.fn(),
+      onopen: () => vi.fn(),
+      onmessage: () => vi.fn(),
+      onerror: () => vi.fn(),
+      onclose: () => vi.fn(),
     };
+  });
+
+  const createWebsocketMock = vi.hoisted(() => {
+    return () => vi.fn().mockReturnValue(mockWebsocket);
   });
 
   vi.mock("../../components/main/message/createWebsocket.ts", () => {
     return {
-      default: vi.fn().mockResolvedValue(mock),
+      default: createWebsocketMock,
     };
   });
 
   vi.mock("react-router-dom", () => ({
     ...vi.importActual("react-router-dom"),
     useNavigate: () => vi.fn(),
-    useParams: vi.fn().mockReturnValue({
-      id: "1",
-      type: "group",
-    }),
+    useParams: () =>
+      vi.fn().mockReturnValue({
+        id: "1",
+        type: "group",
+      }),
   }));
+
+  vi.mock("react", async () => {
+    const actual = (await vi.importActual("react")) as [];
+    return {
+      ...actual,
+      useRef: vi.fn().mockReturnValue({ current: mockWebsocket }),
+    };
+  });
 
   window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-  test("Messages show default text when not connected yet", async () => {
+  test("Messages show loading", async () => {
     customRender(<Messages />, userContext);
 
-    expect(screen.getByText(/No information/)).toBeInTheDocument();
+    expect(screen.getByText(/Loading.../)).toBeInTheDocument();
   });
 
   test("Displays messages and title", async () => {
-    await act(async () => customRender(<Messages />, userContext));
+    customRender(<Messages />, userContext);
 
-    expect(screen.getByRole("heading", { name: "test" })).toBeInTheDocument();
-    expect(screen.getByText(/^Hi this is Leah/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "test" })
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/^Hi this is Leah/)).toBeInTheDocument();
   });
 
   test("Websocket events are added once created", async () => {
-    const spy = vi.spyOn(mock, "addEventListener");
-    await act(async () => customRender(<Messages />, userContext));
+    act(() => {
+      customRender(<Messages />, userContext);
+    });
 
-    expect(spy).toHaveBeenCalled();
+    expect(createWebsocket).toHaveBeenCalled();
   });
 
   test("Websocket closes on unmount", async () => {
-    const spy = vi.spyOn(mock, "close");
-    await act(async () => customRender(<Messages />, userContext));
+    const spy = vi.spyOn(mockWebsocket, "close");
+    act(() => customRender(<Messages />, userContext));
     cleanup();
 
     expect(spy).toHaveBeenCalled();
   });
 
   test("Pushing send sends message to websocket", async () => {
-    const spy = vi.spyOn(mock, "send");
-    await act(async () => customRender(<Messages />, userContext));
+    const spy = vi.spyOn(mockWebsocket, "send");
+    customRender(<Messages />, userContext);
 
     const user = userEvent.setup();
     const message = screen.getByRole("textbox", { name: "message" });
@@ -102,7 +123,7 @@ describe("Message Component", () => {
   });
 
   test("Switches url when delete button is hit", async () => {
-    await act(async () => customRender(<Messages />, userContext));
+    customRender(<Messages />, userContext);
 
     const user = userEvent.setup();
     const button = screen.getByRole("button", { name: "Delete" });

@@ -1,7 +1,7 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import useProvideAuth from "../../useProvideAuth";
+import useProvideAuth from "../../hooks/useProvideAuth";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, "Email is required").max(100),

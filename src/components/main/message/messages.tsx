@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   channelType,
   messageType,
@@ -13,9 +13,9 @@ import MessageBody from "./message_body";
 import "./messages.css";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { AuthContext } from "../../../authProvider";
+import { AuthContext } from "../../../contexts/authProvider";
 import axios from "axios";
-import createWebsocket from "./createWebsocket";
+import useWebSocket from "../../../hooks/useWebsocket";
 
 // Types
 const sendMessageFormSchema = z.object({
@@ -35,8 +35,6 @@ function Messages() {
   } = useForm<sendMessageFormSchemaType>({
     resolver: zodResolver(sendMessageFormSchema),
   });
-  const socket = useRef(null as null | WebSocket);
-  const [isConnected, setIsConnected] = useState(false);
   const [messageResults, setMessageResults] = useState([] as messageType[]);
   const [isLoading, setIsLoading] = useState(true);
   const [channel, setChannel] = useState({} as channelType);
@@ -45,77 +43,48 @@ function Messages() {
 
   const params = useParams();
   const user = useContext(AuthContext);
+  const { connected, errors, message, post } = useWebSocket<messageTypeDto>(
+    `${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message/${params.type}/${
+      params.id
+    }?authorization=${user.token}`
+  );
+
   useEffect(() => {
-    const setUpWebSocket = () => {
-      socket.current = createWebsocket(
-        params.type as string,
-        params.id as string,
-        user.token as string
-      );
-      let intervalId: number;
-      socket.current.onopen = () => {
-        setIsConnected(true);
-        intervalId = setInterval(
-          () => socket.current?.send(""),
-          30000
-        ) as unknown as number;
-      };
-      socket.current.onclose = () => {
-        clearInterval(intervalId);
-        setIsConnected(false);
-      };
-      socket.current.onerror = () => {
-        setIsConnected(false);
-        socket.current?.close();
-        socket.current = null;
-      };
-      socket.current.onmessage = (event) => {
-        (event.data as Blob).text().then((resultString) => {
-          const result: messageTypeDto = JSON.parse(resultString);
-
-          const message: messageType = {
-            isOwner: result.IsOwner,
-            author: result.Author,
-            content: result.Content,
-            createdAt: result.CreatedAt,
-          };
-          setMessageResults((previous) => [...previous, message]);
-        });
-      };
-    };
-
     const setUpChannel = async () => {
       try {
         const results = await Promise.all([
           (await axios.get<messageType[]>(`/api/Message/${params.id}`)).data,
           (await axios.get<channelType>(`/api/Channel/${params.id}`)).data,
         ]);
-
         setChannel(results[1]);
         setMessageResults(results[0]);
-        setUpWebSocket();
-        setTimeout(() => setIsLoading(false), 500);
+        setIsLoading(false);
       } catch (error) {
         console.log(error);
       }
     };
-    setIsLoading(true);
     setUpChannel();
-
-    return () => {
-      socket.current?.close();
-    };
   }, [params, user.token]);
 
-  const postMessage = async (message: string): Promise<boolean | void> => {
-    try {
-      socket.current?.send(message);
-      setIsLoading(false);
-    } catch (error) {
-      // todo better error handler
-      console.error(error);
+  useEffect(() => {
+    if (errors) {
+      console.log(errors);
     }
-  };
+  }, [errors]);
+
+  useEffect(() => {
+    if (message) {
+      setMessageResults((prev) => [
+        ...prev,
+        {
+          isOwner: message.IsOwner,
+          author: message.Author,
+          content: message.Content,
+          createdAt: message.CreatedAt,
+        },
+      ]);
+    }
+  }, [message]);
 
   const deleteChannel = async () => {
     try {
@@ -145,15 +114,13 @@ function Messages() {
     message,
   }) => {
     // Might add a way to not get the websocket message here and just add it directly. timing might be off. Saves resources
-    setIsLoading(true);
-    await postMessage(message);
-
+    post(message);
     setFocus("message");
     reset();
   };
 
   // to do better no info comp
-  if (!params && !isConnected) {
+  if (!params && !connected) {
     return (
       <>
         <div>Bad Connection</div>

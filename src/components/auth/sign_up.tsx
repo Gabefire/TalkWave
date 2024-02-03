@@ -2,7 +2,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { loginErrorType, signUpErrorType } from "../../types/auth";
-import useProvideAuth from "../../useProvideAuth";
+import useProvideAuth from "../../hooks/useProvideAuth";
 
 const signUpFormSchema = z
   .object({
