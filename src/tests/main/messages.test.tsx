@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ReactElement } from "react";
 import Messages from "../../components/main/message/messages";
 import { authContextType } from "../../types/auth";
-import { AuthContext } from "../../authProvider";
+import { AuthContext } from "../../contexts/authProvider";
 import { vi } from "vitest";
 import { act } from "react-dom/test-utils";
 

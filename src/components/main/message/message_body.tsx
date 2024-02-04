@@ -1,67 +1,131 @@
-import { useEffect, useRef } from "react";
-import { messageType } from "../../../types/messages";
+import { useEffect, useRef, useState } from "react";
+import { messageType, messageTypeDto } from "../../../types/messages";
 import dateConverter from "../dateConverter";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
-interface messageBodyType {
-  messageResults: messageType[];
+interface MessageBodyType {
+  message: null | messageTypeDto;
 }
 
-export default function MessageBody({ messageResults }: messageBodyType) {
+export default function MessageBody({ message }: MessageBodyType) {
   const dummy = useRef<HTMLSpanElement>(null);
+  const scrollAble = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState([] as messageType[]);
+  const [isLoading, setIsLoading] = useState(true);
+  const params = useParams();
+  const [messagesReceived, setMessagesReceived] = useState(false);
 
   useEffect(() => {
-    dummy.current?.scrollIntoView({
-      behavior: "instant",
-      block: "end",
-    });
-  }, [messageResults]);
+    const getMessages = async () => {
+      try {
+        const result = (
+          await axios.get<messageType[]>(`/api/Message/${params.id}`)
+        ).data;
+        setMessages(result);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getMessages();
+    let scroller: HTMLDivElement;
+    if (!scrollAble.current !== null) {
+      scrollAble.current?.addEventListener("scrollend", () => {
+        setMessagesReceived(true);
+      });
+      scroller = scrollAble.current as HTMLDivElement;
+    }
+    return () => {
+      scroller.removeEventListener("scrollend", () => {
+        setMessagesReceived(true);
+      });
+      setMessagesReceived(false);
+    };
+  }, [params]);
+
+  useEffect(() => {
+    if (message !== null) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          isOwner: message.IsOwner,
+          author: message.Author,
+          content: message.Content,
+          createdAt: message.CreatedAt,
+        },
+      ]);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    messagesReceived
+      ? dummy.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        })
+      : dummy.current?.scrollIntoView({
+          behavior: "instant",
+          block: "end",
+        });
+  });
 
   return (
-    <>
-      <div className="main-message-content">
-        {messageResults.length === 0
-          ? "No Messages Found"
-          : messageResults.map((post, index) => {
-              return (
+    <div
+      className="main-message-content"
+      ref={scrollAble}
+      style={
+        messagesReceived
+          ? {
+              overflowY: "auto",
+            }
+          : {
+              overflowY: "hidden",
+            }
+      }
+    >
+      {!isLoading && messages.length === 0
+        ? "No Messages Found"
+        : messages.map((post, index) => {
+            return (
+              <div
+                className="message"
+                style={
+                  post.isOwner
+                    ? {
+                        textAlign: "end",
+                        alignSelf: "flex-end",
+                        backgroundColor: "gray",
+                      }
+                    : {
+                        textAlign: "start",
+                        backgroundColor: "#007AFF",
+                      }
+                }
+                key={`message-${index}`}
+              >
                 <div
-                  className="message"
+                  className="message-header"
                   style={
                     post.isOwner
                       ? {
-                          textAlign: "end",
-                          alignSelf: "flex-end",
-                          backgroundColor: "gray",
+                          justifyContent: "flex-end",
                         }
                       : {
-                          textAlign: "start",
-                          backgroundColor: "#007AFF",
+                          justifyContent: "start",
                         }
                   }
-                  key={`message-${index}`}
                 >
-                  <div
-                    className="message-header"
-                    style={
-                      post.isOwner
-                        ? {
-                            justifyContent: "flex-end",
-                          }
-                        : {
-                            justifyContent: "start",
-                          }
-                    }
-                  >
-                    <div className="from">{post.author}</div>
-                    <div className="date-posted">
-                      {dateConverter(post.createdAt)}
-                    </div>
+                  <div className="from">{post.author}</div>
+                  <div className="date-posted">
+                    {dateConverter(post.createdAt)}
                   </div>
-                  <p>{post.content}</p>
                 </div>
-              );
-            })}
-        <span ref={dummy}></span>
-      </div>
-    </>
+                <p>{post.content}</p>
+              </div>
+            );
+          })}
+      <span ref={dummy}></span>
+    </div>
   );
 }

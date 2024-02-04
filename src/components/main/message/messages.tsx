@@ -1,21 +1,15 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import {
-  channelType,
-  messageType,
-  messageTypeDto,
-} from "../../../types/messages";
+import { messageTypeDto } from "../../../types/messages";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
 import MessageBody from "./message_body";
-
 import "./messages.css";
-import { useNavigate, useParams } from "react-router-dom";
-
-import { AuthContext } from "../../../authProvider";
-import axios from "axios";
+import { useParams } from "react-router-dom";
+import { AuthContext } from "../../../contexts/authProvider";
 import createWebsocket from "./createWebsocket";
+import MessageHeader from "./message_header";
+import { TailSpin } from "react-loader-spinner";
 
 // Types
 const sendMessageFormSchema = z.object({
@@ -37,11 +31,7 @@ function Messages() {
   });
   const socket = useRef(null as null | WebSocket);
   const [isConnected, setIsConnected] = useState(false);
-  const [messageResults, setMessageResults] = useState([] as messageType[]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [channel, setChannel] = useState({} as channelType);
-
-  const navigate = useNavigate();
+  const [message, setMessage] = useState(null as null | messageTypeDto);
 
   const params = useParams();
   const user = useContext(AuthContext);
@@ -54,7 +44,7 @@ function Messages() {
       );
       let intervalId: number;
       socket.current.onopen = () => {
-        setIsConnected(true);
+        setTimeout(() => setIsConnected(true), 1000);
         intervalId = setInterval(
           () => socket.current?.send(""),
           30000
@@ -72,35 +62,15 @@ function Messages() {
       socket.current.onmessage = (event) => {
         (event.data as Blob).text().then((resultString) => {
           const result: messageTypeDto = JSON.parse(resultString);
-
-          const message: messageType = {
-            isOwner: result.IsOwner,
-            author: result.Author,
-            content: result.Content,
-            createdAt: result.CreatedAt,
-          };
-          setMessageResults((previous) => [...previous, message]);
+          setMessage(result);
         });
       };
     };
-
-    const setUpChannel = async () => {
-      try {
-        const results = await Promise.all([
-          (await axios.get<messageType[]>(`/api/Message/${params.id}`)).data,
-          (await axios.get<channelType>(`/api/Channel/${params.id}`)).data,
-        ]);
-
-        setChannel(results[1]);
-        setMessageResults(results[0]);
-        setUpWebSocket();
-        setTimeout(() => setIsLoading(false), 500);
-      } catch (error) {
-        console.log(error);
-      }
+    setUpWebSocket();
+    window.ononline = () => {
+      socket.current?.close();
+      setUpWebSocket();
     };
-    setIsLoading(true);
-    setUpChannel();
 
     return () => {
       socket.current?.close();
@@ -110,34 +80,9 @@ function Messages() {
   const postMessage = async (message: string): Promise<boolean | void> => {
     try {
       socket.current?.send(message);
-      setIsLoading(false);
     } catch (error) {
       // todo better error handler
       console.error(error);
-    }
-  };
-
-  const deleteChannel = async () => {
-    try {
-      await axios.delete(`/api/Channel/${params.id}`);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      navigate("/main");
-    }
-  };
-
-  const leaveChannel = async () => {
-    try {
-      if (params.type == "user") {
-        throw new Error("invalid operation");
-      } else {
-        await axios.put(`/api/GroupChannel/leave/${params.id}`);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      navigate("/main");
     }
   };
 
@@ -145,47 +90,25 @@ function Messages() {
     message,
   }) => {
     // Might add a way to not get the websocket message here and just add it directly. timing might be off. Saves resources
-    setIsLoading(true);
     await postMessage(message);
-
     setFocus("message");
     reset();
   };
 
-  // to do better no info comp
-  if (!params && !isConnected) {
-    return (
-      <>
-        <div>Bad Connection</div>
-      </>
-    );
-  }
-
   return (
     <div className="message-body">
-      {isLoading ? (
-        <div>Loading...</div>
+      {!isConnected ? (
+        <TailSpin
+          height="40"
+          width="40"
+          color="white"
+          ariaLabel="tail-spin-loading"
+          wrapperStyle={{}}
+        />
       ) : (
         <>
-          <div className="messages-top-bar">
-            <h2>{channel.name}</h2>
-            {channel.isOwner || params.type == "user" ? (
-              <button
-                className="message-header-btn delete"
-                onClick={deleteChannel}
-              >
-                Delete
-              </button>
-            ) : (
-              <button
-                className="message-header-btn leave"
-                onClick={leaveChannel}
-              >
-                Leave
-              </button>
-            )}
-          </div>
-          <MessageBody messageResults={messageResults} />
+          <MessageHeader />
+          <MessageBody message={message} />
           <form className="send-message" onSubmit={handleSubmit(onSubmit)}>
             <textarea
               aria-label="message"

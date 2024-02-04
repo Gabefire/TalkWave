@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AuthContext } from "./authProvider";
+import { AuthContext } from "./contexts/authProvider";
 import {
   loginErrorType,
   loginUserDtoType,

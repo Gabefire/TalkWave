@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { authContextType } from "./types/auth";
+import { authContextType } from "../types/auth";
 
 export const AuthContext: React.Context<authContextType> = createContext({
   userName: null as string | null,

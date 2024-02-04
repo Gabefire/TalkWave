@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ReactElement } from "react";
 import Header from "../../components/main/header/header";
 import { BrowserRouter } from "react-router-dom";
-import { AuthContext } from "../../authProvider";
+import { AuthContext } from "../../contexts/authProvider";
 import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
 

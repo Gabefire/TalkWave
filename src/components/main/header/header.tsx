@@ -5,7 +5,7 @@ import useClickOutside from "../useClickOutside";
 import SearchIcon from "../../../assets/magnify.svg?react";
 import { channelType, userSearchDto } from "../../../types/messages";
 import "./header.css";
-import { AuthContext } from "../../../authProvider";
+import { AuthContext } from "../../../contexts/authProvider";
 import axios from "axios";
 import UserIcon from "./user_icon";
 import useProvideAuth from "../../../useProvideAuth";

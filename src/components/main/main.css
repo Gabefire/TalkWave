@@ -1,16 +1,13 @@
-.root, .app, body{
+.app{
   display: grid;
-  grid-template-columns: minmax(300px, 580px) 1fr;
+  grid-template-columns: minmax(300px, 1fr) 4fr;
   background-image: linear-gradient(to bottom right, rgb(24, 48, 78), rgb(15,30,46));
   color: rgba(255, 255, 255, 0.75);
-  overflow-x: hidden;
-  overflow-y: hidden;
-  height: 100vh;
-  gap: 5px;
+  width: 100%;
+  padding: 0 7px 10px 7px;
 }
 
 .top-header {
-  width: 100%;
   grid-area: 1/1/2/3;
 
 }

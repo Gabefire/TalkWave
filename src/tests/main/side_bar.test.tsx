@@ -5,7 +5,7 @@ import { ReactElement } from "react";
 import SideBar from "../../components/main/side_bar/side_bar";
 import { BrowserRouter } from "react-router-dom";
 import { act } from "react-dom/test-utils";
-import { AuthContext } from "../../authProvider";
+import { AuthContext } from "../../contexts/authProvider";
 import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
 
