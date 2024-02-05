@@ -1,8 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { messageTypeDto } from "../../../types/messages";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import MessageBody from "./message_body";
 import "./messages.css";
 import { useParams } from "react-router-dom";
@@ -10,25 +7,9 @@ import { AuthContext } from "../../../contexts/authProvider";
 import createWebsocket from "./createWebsocket";
 import MessageHeader from "./message_header";
 import { TailSpin } from "react-loader-spinner";
+import MessageSend from "./message_send";
 
-// Types
-const sendMessageFormSchema = z.object({
-  message: z.string().min(1),
-});
-
-type sendMessageFormSchemaType = z.infer<typeof sendMessageFormSchema>;
-
-// Message Component
 function Messages() {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setFocus,
-    formState: { isSubmitting },
-  } = useForm<sendMessageFormSchemaType>({
-    resolver: zodResolver(sendMessageFormSchema),
-  });
   const socket = useRef(null as null | WebSocket);
   const [isConnected, setIsConnected] = useState(false);
   const [message, setMessage] = useState(null as null | messageTypeDto);
@@ -77,22 +58,13 @@ function Messages() {
     };
   }, [params, user.token]);
 
-  const postMessage = async (message: string): Promise<boolean | void> => {
+  const postMessage = async (message: string): Promise<void> => {
     try {
       socket.current?.send(message);
     } catch (error) {
       // todo better error handler
       console.error(error);
     }
-  };
-
-  const onSubmit: SubmitHandler<sendMessageFormSchemaType> = async ({
-    message,
-  }) => {
-    // Might add a way to not get the websocket message here and just add it directly. timing might be off. Saves resources
-    await postMessage(message);
-    setFocus("message");
-    reset();
   };
 
   return (
@@ -103,29 +75,13 @@ function Messages() {
           width="40"
           color="white"
           ariaLabel="tail-spin-loading"
-          wrapperStyle={{}}
+          wrapperClass="load"
         />
       ) : (
         <>
           <MessageHeader />
           <MessageBody message={message} />
-          <form className="send-message" onSubmit={handleSubmit(onSubmit)}>
-            <textarea
-              aria-label="message"
-              rows={4}
-              cols={50}
-              className="message-input"
-              id="message-input"
-              {...register("message")}
-            />
-            <button
-              type="submit"
-              className="submit-message-btn"
-              disabled={isSubmitting}
-            >
-              Send
-            </button>
-          </form>
+          <MessageSend post={postMessage} />
         </>
       )}
     </div>

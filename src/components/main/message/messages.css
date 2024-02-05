@@ -98,3 +98,9 @@
   align-items: center;
   gap: 10px;
 }
+
+.load {
+  align-self: center;
+  position: absolute;
+  top: 50%;
+}

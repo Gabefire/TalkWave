@@ -1,6 +1,6 @@
 .app{
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) 4fr;
+  grid-template-columns: minmax(300px, 1fr) 5fr;
   background-image: linear-gradient(to bottom right, rgb(24, 48, 78), rgb(15,30,46));
   color: rgba(255, 255, 255, 0.75);
   width: 100%;
