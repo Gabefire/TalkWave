@@ -9,6 +9,7 @@ import { AuthContext } from "../../../contexts/authProvider";
 import axios from "axios";
 import UserIcon from "./user_icon";
 import useProvideAuth from "../../../useProvideAuth";
+import { TailSpin } from "react-loader-spinner";
 
 function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
@@ -62,6 +63,7 @@ function Header() {
         ]);
         setGroupSearchResults(results[0]);
         setUserSearchResults(results[1]);
+        setLoadingSearchResults(false);
       } catch (err) {
         console.log(err);
       }
@@ -70,8 +72,7 @@ function Header() {
       setDisplaySearchBox(false);
       return;
     }
-    const timeoutId = setTimeout(getSearchResults, 2000);
-    setLoadingSearchResults(false);
+    const timeoutId = setTimeout(getSearchResults, 1000);
     return () => {
       clearTimeout(timeoutId);
       setLoadingSearchResults(true);
@@ -134,50 +135,55 @@ function Header() {
           />
           {displaySearchBox ? (
             <div className="search-box popover" ref={searchBoxRef}>
-              <div className="users-search-section search-section">
-                <h5>Users</h5>
-                {loadingSearchResults ? (
-                  <div className="load">Loading...</div>
-                ) : (
-                  <div className="results">
-                    {userSearchResults.length > 0 ? (
-                      userSearchResults.map((user) => {
-                        return <UserIcon user={user} />;
-                      })
-                    ) : (
-                      <div className="no-results">No Results</div>
-                    )}
+              {loadingSearchResults ? (
+                <TailSpin
+                  height="20"
+                  width="20"
+                  color="white"
+                  ariaLabel="tail-spin-loading"
+                  wrapperClass="load-search"
+                />
+              ) : (
+                <>
+                  <div className="users-search-section search-section">
+                    <h5>Users</h5>
+                    <div className="results">
+                      {userSearchResults.length > 0 ? (
+                        userSearchResults.map((user) => {
+                          return <UserIcon user={user} key={user.userId} />;
+                        })
+                      ) : (
+                        <div className="no-results">No Results</div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className="groups-search-section search-section">
-                <h5>Groups</h5>{" "}
-                {loadingSearchResults ? (
-                  <div className="load">Loading...</div>
-                ) : (
-                  <div className="results">
-                    {groupSearchResults.length > 0 ? (
-                      groupSearchResults.map((channel) => {
-                        if (channel.type == "group") {
-                          return (
-                            <Link
-                              to={`${channel.type}/${channel.channelId}`}
-                              onClick={async (e) => {
-                                await joinGroupChannel(channel.channelId);
-                                if (e) setSearchTerm("");
-                              }}
-                            >
-                              {`# ${channel.name}`}
-                            </Link>
-                          );
-                        }
-                      })
-                    ) : (
-                      <div className="no-results">No Results</div>
-                    )}
+                  <div className="groups-search-section search-section">
+                    <h5>Groups</h5>{" "}
+                    <div className="results">
+                      {groupSearchResults.length > 0 ? (
+                        groupSearchResults.map((channel) => {
+                          if (channel.type == "group") {
+                            return (
+                              <Link
+                                to={`${channel.type}/${channel.channelId}`}
+                                onClick={async (e) => {
+                                  await joinGroupChannel(channel.channelId);
+                                  if (e) setSearchTerm("");
+                                }}
+                                key={channel.channelId}
+                              >
+                                {`# ${channel.name}`}
+                              </Link>
+                            );
+                          }
+                        })
+                      ) : (
+                        <div className="no-results">No Results</div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
           ) : undefined}
         </div>

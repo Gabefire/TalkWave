@@ -28,7 +28,7 @@ function Messages() {
         setTimeout(() => setIsConnected(true), 1000);
         intervalId = setInterval(
           () => socket.current?.send(""),
-          30000
+          60000
         ) as unknown as number;
       };
       socket.current.onclose = () => {

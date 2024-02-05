@@ -24,6 +24,8 @@ export const useProvideAuth = () => {
       ).data;
       setToken(userDto.token);
       setUserName(userDto.userName);
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + userDto.token;
       navigator("/main");
     } catch (err) {
       if (typeof err === "string") {

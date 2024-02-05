@@ -27,7 +27,7 @@ export interface channelType {
 }
 
 export interface userSearchDto   {
-  userId: number,
+  userId: string,
   userName: string,
   profilePicLink: string
 }

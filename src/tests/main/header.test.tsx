@@ -32,13 +32,16 @@ const userContext: authContextType = {
   },
 };
 
-vi.mock("react-router-dom", () => ({
-  ...vi.importActual("react-router-dom"),
-  useParams: () => vi.fn().mockReturnValue({ id: "1", type: "group" }),
-}));
+vi.mock("react-router-dom", async () => {
+  const actual: [] = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useParams: () => vi.fn().mockReturnValue({ id: "1", type: "group" }),
+  };
+});
 
 describe("header component", () => {
-  it("Drop down menu profile controls disappear when clicking somewhere else in doc", async () => {
+  test("Drop down menu profile controls disappear when clicking somewhere else in doc", async () => {
     const user = userEvent.setup();
     customRender(
       <BrowserRouter>
@@ -62,7 +65,7 @@ describe("header component", () => {
 
     expect(join_button).not.toBeInTheDocument();
   });
-  it("Drop down menu button will close profile controls when pressed again", async () => {
+  test("Drop down menu button will close profile controls when pressed again", async () => {
     const user = userEvent.setup();
     customRender(
       <BrowserRouter>
@@ -87,7 +90,7 @@ describe("header component", () => {
         })
     ).toBeFalsy();
   });
-  it("Search bar drops menu when clicked", async () => {
+  test("Search bar drops menu when clicked", async () => {
     const user = userEvent.setup();
     customRender(
       <BrowserRouter>
@@ -104,7 +107,7 @@ describe("header component", () => {
       await screen.findByRole("heading", { name: /Groups/ })
     ).toBeInTheDocument();
   });
-  it("Clicking search link switches page", async () => {
+  test("Clicking search link switches page", async () => {
     const user = userEvent.setup();
     const currentPage = location.href;
     customRender(
@@ -116,11 +119,11 @@ describe("header component", () => {
 
     const searchBar = screen.getByRole("searchbox");
 
-    await user.type(searchBar, "test");
+    await user.type(searchBar, "gabe");
 
-    const testLink = screen.getAllByRole("link")[0];
+    const testLink = await screen.findAllByRole("link");
 
-    await user.click(testLink);
+    await user.click(testLink[0]);
 
     expect(location.href).not.toBe(currentPage);
   });

@@ -25,6 +25,7 @@ function UserIcon({ user }: userIconType) {
   return (
     <>
       <button
+        className="user-icon"
         key={user.userId}
         onClick={async () => {
           await checkUserChannel(user.userId.toString());

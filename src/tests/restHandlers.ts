@@ -1,5 +1,5 @@
 import { loginUserDtoType } from "../types/auth";
-import { channelType, messageType } from "../types/messages";
+import { channelType, messageType, userSearchDto } from "../types/messages";
 import { HttpResponse, http } from "msw";
 
 const messageList: messageType[] = [
@@ -76,6 +76,24 @@ const groupSearchResults: channelType[] =[
         isOwner: true,
       },
 ]
+
+const userSearchResults: userSearchDto[] = [
+  {
+    userId: "1",
+    userName: "leah",
+    profilePicLink: ""
+  },
+  {
+    userId: "2",
+    userName: "gabe",
+    profilePicLink: ""
+  },
+  {
+    userId: "3",
+    userName: "ben",
+    profilePicLink: ""
+  }
+]
   
 
 const restHandler = [
@@ -100,6 +118,15 @@ const restHandler = [
     }),
     http.post("/api/User/register", () => {
         return HttpResponse.text("test")
+    }),
+    http.get("/api/GroupChannel/*", () => {
+      return HttpResponse.json(groupSearchResults)
+    }),
+    http.get("/api/User/*", () => {
+      return HttpResponse.json(userSearchResults)
+    }),
+    http.get("/api/GroupChannel/join/*", () => {
+      return HttpResponse.text()
     })
   ];
 
