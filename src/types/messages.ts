@@ -31,3 +31,13 @@ export interface userSearchDto   {
   userName: string,
   profilePicLink: string
 }
+
+export interface groupChannelDto {
+  channelId: number,
+  channelPicLink: string,
+  createdAt: string,
+  lastUpdated: string,
+  name: string,
+  type: "group",
+  userId: number
+}

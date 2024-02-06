@@ -18,8 +18,9 @@ function MainRoot() {
   return (
     <div className="app">
       <Header />
-      <Outlet />
-
+      <div className="message-body">
+        <Outlet />
+      </div>
       <SideBar />
     </div>
   );

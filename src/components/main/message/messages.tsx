@@ -23,22 +23,16 @@ function Messages() {
         params.id as string,
         user.token as string
       );
-      let intervalId: number;
+
       socket.current.onopen = () => {
         setTimeout(() => setIsConnected(true), 1000);
-        intervalId = setInterval(
-          () => socket.current?.send(""),
-          60000
-        ) as unknown as number;
       };
       socket.current.onclose = () => {
-        clearInterval(intervalId);
         setIsConnected(false);
       };
       socket.current.onerror = () => {
         setIsConnected(false);
         socket.current?.close();
-        socket.current = null;
       };
       socket.current.onmessage = (event) => {
         (event.data as Blob).text().then((resultString) => {
@@ -48,12 +42,17 @@ function Messages() {
       };
     };
     setUpWebSocket();
+    const intervalId = setInterval(
+      () => socket.current?.send(""),
+      60000
+    ) as unknown as number;
     window.ononline = () => {
       socket.current?.close();
       setUpWebSocket();
     };
 
     return () => {
+      clearInterval(intervalId);
       socket.current?.close();
     };
   }, [params, user.token]);
@@ -68,7 +67,7 @@ function Messages() {
   };
 
   return (
-    <div className="message-body">
+    <>
       {!isConnected ? (
         <TailSpin
           height="40"
@@ -84,7 +83,7 @@ function Messages() {
           <MessageSend post={postMessage} />
         </>
       )}
-    </div>
+    </>
   );
 }
 
