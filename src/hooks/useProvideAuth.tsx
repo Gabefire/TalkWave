@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../contexts/authProvider";
 import {
   loginErrorType,
@@ -7,13 +7,10 @@ import {
   signUpErrorType,
   signUpUserType,
 } from "../types/auth";
-
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 export const useProvideAuth = () => {
   const { setToken, setUserName } = useContext(AuthContext);
-  const navigator = useNavigate();
 
   const login = async (
     loginUser: loginUserType
@@ -26,7 +23,6 @@ export const useProvideAuth = () => {
       setUserName(userDto.userName);
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + userDto.token;
-      navigator("/main");
     } catch (err) {
       if (typeof err === "string") {
         return [{ root: err }];
@@ -61,6 +57,31 @@ export const useProvideAuth = () => {
     }
   };
 
+  const editProfile = async (
+    signUpUser: signUpUserType
+  ): Promise<void | signUpErrorType[]> => {
+    try {
+      await axios.put("/api/User/edit", signUpUser);
+      const loginErrors = await login({
+        email: signUpUser.email,
+        password: signUpUser.password,
+      });
+      if (loginErrors) {
+        return loginErrors;
+      }
+    } catch (err) {
+      if (typeof err === "string") {
+        return [{ root: err }];
+      } else if (axios.isAxiosError(err)) {
+        if (err.response?.status == 409) {
+          return [{ root: err.response?.data }];
+        } else {
+          return [{ root: "Bad Connection" }];
+        }
+      }
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setUserName(null);
@@ -70,6 +91,7 @@ export const useProvideAuth = () => {
     login,
     signUp,
     logout,
+    editProfile,
   };
 };
 

@@ -1,7 +1,7 @@
 /// <reference types="vite-plugin-svgr/client" />
 import { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import useClickOutside from "../useClickOutside";
+import useClickOutside from "../../../hooks/useClickOutside";
 import SearchIcon from "../../../assets/magnify.svg?react";
 import { channelType, userSearchDto } from "../../../types/messages";
 import "./header.css";

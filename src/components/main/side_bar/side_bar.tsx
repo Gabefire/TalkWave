@@ -1,10 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { channelType } from "../../../types/messages";
-
 import "./side_bar.css";
 import { Link, NavLink } from "react-router-dom";
-
-import useClickOutside from "../useClickOutside";
+import useClickOutside from "../../../hooks/useClickOutside";
 import axios from "axios";
 
 function SideBar() {

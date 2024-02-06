@@ -2,6 +2,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useProvideAuth from "../../hooks/useProvideAuth";
+import { useNavigate } from "react-router-dom";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, "Email is required").max(100),
@@ -19,6 +20,7 @@ function Login() {
   } = useForm<loginFormSchemaType>({ resolver: zodResolver(loginFormSchema) });
 
   const { login } = useProvideAuth();
+  const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<loginFormSchemaType> = async (user) => {
     const results = await login(user);
@@ -34,10 +36,12 @@ function Login() {
           setError("root.serverError", { type: "404", message: `${value}` });
         }
       });
+    } else {
+      navigate("/main");
     }
   };
   return (
-    <form className="form" onSubmit={handleSubmit(onSubmit)}>
+    <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
       <h1>Login</h1>
       <label htmlFor="email" className="form-group">
         Email:
@@ -56,7 +60,7 @@ function Login() {
           </span>
         )}
       </label>
-      <label htmlFor="password">
+      <label htmlFor="password" className="form-group">
         Password:
         <input
           type="password"
@@ -82,6 +86,15 @@ function Login() {
         className="form-button login"
       >
         Login
+      </button>
+      <button
+        className="form-button sign-up"
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(-1);
+        }}
+      >
+        Back
       </button>
     </form>
   );

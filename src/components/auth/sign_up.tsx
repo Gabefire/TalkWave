@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { loginErrorType, signUpErrorType } from "../../types/auth";
 import useProvideAuth from "../../hooks/useProvideAuth";
+import { useNavigate } from "react-router-dom";
 
 const signUpFormSchema = z
   .object({
@@ -30,6 +31,7 @@ const SignUp = () => {
     resolver: zodResolver(signUpFormSchema),
   });
 
+  const navigate = useNavigate();
   const { signUp } = useProvideAuth();
 
   const validateResults = (results: signUpErrorType[] | loginErrorType[]) => {
@@ -59,11 +61,13 @@ const SignUp = () => {
     const signUpResults = await signUp(user);
     if (signUpResults instanceof Array && signUpResults.length > 0) {
       validateResults(signUpResults);
+    } else {
+      navigate("/main");
     }
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit(onSubmit)}>
+    <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
       <h1>Sign Up</h1>
       <label htmlFor="username" className="form-group">
         Username:
@@ -142,6 +146,15 @@ const SignUp = () => {
         className="form-button sign-up"
       >
         Sign Up
+      </button>
+      <button
+        className="form-button sign-up"
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(-1);
+        }}
+      >
+        Back
       </button>
     </form>
   );
