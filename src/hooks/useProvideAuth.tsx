@@ -1,12 +1,12 @@
 import { useContext } from "react";
-import { AuthContext } from "./contexts/authProvider";
+import { AuthContext } from "../contexts/authProvider";
 import {
   loginErrorType,
   loginUserDtoType,
   loginUserType,
   signUpErrorType,
   signUpUserType,
-} from "./types/auth";
+} from "../types/auth";
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";

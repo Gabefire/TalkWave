@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useProvideAuth } from "../../useProvideAuth";
+import { useProvideAuth } from "../../hooks/useProvideAuth";
 
 export default function MainPage() {
   const { login } = useProvideAuth();

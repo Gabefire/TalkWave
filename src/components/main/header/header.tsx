@@ -8,8 +8,8 @@ import "./header.css";
 import { AuthContext } from "../../../contexts/authProvider";
 import axios from "axios";
 import UserIcon from "./user_icon";
-import useProvideAuth from "../../../useProvideAuth";
 import { TailSpin } from "react-loader-spinner";
+import useProvideAuth from "../../../hooks/useProvideAuth";
 
 function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);

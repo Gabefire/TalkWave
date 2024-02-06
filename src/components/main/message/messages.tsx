@@ -4,7 +4,6 @@ import MessageBody from "./message_body";
 import "./messages.css";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../../../contexts/authProvider";
-import createWebsocket from "./createWebsocket";
 import MessageHeader from "./message_header";
 import { TailSpin } from "react-loader-spinner";
 import MessageSend from "./message_send";
@@ -18,10 +17,10 @@ function Messages() {
   const user = useContext(AuthContext);
   useEffect(() => {
     const setUpWebSocket = () => {
-      socket.current = createWebsocket(
-        params.type as string,
-        params.id as string,
-        user.token as string
+      socket.current = new WebSocket(
+        `${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message/${params.type}/${
+          params.id
+        }?authorization=${user.token}`
       );
 
       socket.current.onopen = () => {
@@ -29,10 +28,12 @@ function Messages() {
       };
       socket.current.onclose = () => {
         setIsConnected(false);
+        socket.current = null;
       };
       socket.current.onerror = () => {
         setIsConnected(false);
         socket.current?.close();
+        socket.current = null;
       };
       socket.current.onmessage = (event) => {
         (event.data as Blob).text().then((resultString) => {
@@ -41,6 +42,7 @@ function Messages() {
         });
       };
     };
+
     setUpWebSocket();
     const intervalId = setInterval(
       () => socket.current?.send(""),
@@ -54,6 +56,7 @@ function Messages() {
     return () => {
       clearInterval(intervalId);
       socket.current?.close();
+      socket.current = null;
     };
   }, [params, user.token]);
 
@@ -67,7 +70,7 @@ function Messages() {
   };
 
   return (
-    <>
+    <div className="message-body">
       {!isConnected ? (
         <TailSpin
           height="40"
@@ -83,7 +86,7 @@ function Messages() {
           <MessageSend post={postMessage} />
         </>
       )}
-    </>
+    </div>
   );
 }
 
