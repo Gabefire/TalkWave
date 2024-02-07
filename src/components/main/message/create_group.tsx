@@ -51,7 +51,9 @@ function CreateGroup() {
             Name
             <input type="text" id="channel-name" {...register("name")} />
           </label>
-          <button disabled={isSubmitting}>Submit</button>
+          <button disabled={isSubmitting} className="modal-button">
+            Submit
+          </button>
         </div>
         <div>
           Groups are where conversations happen around a topic. Use a name that

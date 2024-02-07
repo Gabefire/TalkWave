@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { channelType } from "../../../types/messages";
 import "./side_bar.css";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 import useClickOutside from "../../../hooks/useClickOutside";
 import axios from "axios";
+import ProfilePic from "../profile_pic";
 
 function SideBar() {
   const [channelList, setChannelList] = useState([] as channelType[]);
@@ -11,6 +12,7 @@ function SideBar() {
     "all" as "all" | "user" | "group"
   );
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
+  const params = useParams();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const additionalRef = useRef<HTMLButtonElement>(null);
@@ -32,7 +34,7 @@ function SideBar() {
       }
     };
     getChannels();
-  }, []);
+  }, [params]);
 
   return (
     <div className="side-bar">
@@ -101,9 +103,11 @@ function SideBar() {
                     className="channel"
                     key={channel.channelId}
                   >
-                    {channel.type == "group"
-                      ? `# ${channel.name}`
-                      : channel.name}
+                    {channel.type === "group" ? (
+                      `# ${channel.name}`
+                    ) : (
+                      <ProfilePic url="" size="18" userName={channel.name} />
+                    )}
                   </NavLink>
                 );
               }
@@ -114,9 +118,11 @@ function SideBar() {
                     className="channel"
                     key={channel.channelId}
                   >
-                    {channel.type === "group"
-                      ? `# ${channel.name}`
-                      : channel.name}
+                    {channel.type === "group" ? (
+                      `# ${channel.name}`
+                    ) : (
+                      <ProfilePic url="" size="18" userName={channel.name} />
+                    )}
                   </NavLink>
                 );
               }

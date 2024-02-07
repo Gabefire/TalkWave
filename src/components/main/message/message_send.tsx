@@ -44,7 +44,7 @@ export default function MessageSend({ post }: MessageSendType) {
       />
       <button
         type="submit"
-        className="submit-message-btn"
+        className="submit-message-btn modal-button"
         disabled={isSubmitting}
       >
         Send

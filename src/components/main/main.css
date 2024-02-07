@@ -9,7 +9,6 @@
 
 .top-header {
   grid-area: 1/1/2/3;
-
 }
 
 @media only screen and (max-width: 600px) {

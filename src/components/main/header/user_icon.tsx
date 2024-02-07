@@ -1,6 +1,7 @@
 import axios from "axios";
 import { userSearchDto } from "../../../types/messages";
 import { useNavigate } from "react-router-dom";
+import ProfilePic from "../profile_pic";
 
 interface userIconType {
   user: userSearchDto;
@@ -24,15 +25,14 @@ function UserIcon({ user }: userIconType) {
   };
   return (
     <>
+      <ProfilePic size="15" url="" userName={user.userName} />
       <button
         className="user-icon"
         key={user.userId}
         onClick={async () => {
           await checkUserChannel(user.userId.toString());
         }}
-      >
-        {user.userName}
-      </button>
+      ></button>
     </>
   );
 }

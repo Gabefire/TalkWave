@@ -32,6 +32,7 @@
   flex-direction: column;
   height: calc(100vh - 30px - 180px);
   overflow-x: hidden;
+  padding: 5px;
 }
 
 /* custom scrollbar */
@@ -51,7 +52,8 @@
   width: clamp(230px, 30%, 500px);
   word-break: break-all;
   white-space: normal;
-  margin: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   border-radius: 10px;
   padding: 5px;
   color: white;
@@ -119,6 +121,11 @@
   margin-top: 0;
 }
 
+.modal h2 {
+  color: white;
+  text-align: center;
+}
+
 .modal label{
   display: flex;
   flex-direction: column;
@@ -141,11 +148,23 @@
 }
 
 .inputs button {
+align-self: flex-end;
+}
+
+.modal-button {
   height: 22px;
-  align-self: flex-end;
-  color: white;
   background-color: rgb(30, 30, 30);
   border: none;
   border-radius: 2px;
   cursor: pointer;
+  color: white;
+}
+
+.welcome-button {
+  width: 100%;
+}
+
+.send-message .submit-message-btn {
+  margin-left: 5px;
+  background-color: rgb(40, 40, 40);
 }
