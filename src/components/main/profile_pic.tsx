@@ -9,7 +9,7 @@ interface ProfilePicType {
 }
 
 function ProfilePic({ url, size, userName }: ProfilePicType) {
-  const [color, setColor] = useState("red");
+  const [color, setColor] = useState("green");
 
   useEffect(() => {
     const letters = "0123456789ABCDEF";

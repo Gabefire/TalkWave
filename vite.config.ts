@@ -15,6 +15,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/tests/setup",
+    testTimeout: 2000,
     css: {
       modules: {
         classNameStrategy: "non-scoped",

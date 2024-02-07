@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { channelType } from "../../../types/messages";
 import "./side_bar.css";
-import { Link, NavLink, useParams } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import useClickOutside from "../../../hooks/useClickOutside";
 import axios from "axios";
 import ProfilePic from "../profile_pic";
@@ -12,7 +12,6 @@ function SideBar() {
     "all" as "all" | "user" | "group"
   );
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
-  const params = useParams();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const additionalRef = useRef<HTMLButtonElement>(null);
@@ -34,7 +33,7 @@ function SideBar() {
       }
     };
     getChannels();
-  }, [params]);
+  }, []);
 
   return (
     <div className="side-bar">
@@ -121,7 +120,7 @@ function SideBar() {
                     {channel.type === "group" ? (
                       `# ${channel.name}`
                     ) : (
-                      <ProfilePic url="" size="18" userName={channel.name} />
+                      <ProfilePic url="" size="20" userName={channel.name} />
                     )}
                   </NavLink>
                 );
