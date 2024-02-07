@@ -25,14 +25,15 @@ function UserIcon({ user }: userIconType) {
   };
   return (
     <>
-      <ProfilePic size="15" url="" userName={user.userName} />
       <button
         className="user-icon"
         key={user.userId}
         onClick={async () => {
           await checkUserChannel(user.userId.toString());
         }}
-      ></button>
+      >
+        <ProfilePic size="15" url="" userName={user.userName} />
+      </button>
     </>
   );
 }
