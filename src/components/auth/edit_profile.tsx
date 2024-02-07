@@ -7,12 +7,14 @@ import { useNavigate } from "react-router-dom";
 
 const signUpFormSchema = z
   .object({
-    userName: z.string().min(1, "Username is required").max(100),
-    email: z.string().email("Invalid email").or(z.literal("")),
-    password: z.string().min(1, "Password is required"),
-    passwordConfirmation: z
+    userName: z
       .string()
-      .min(1, "Password confirmation is required"),
+      .min(1, "Username is required")
+      .max(100)
+      .or(z.literal("")),
+    email: z.string().email("Invalid email").or(z.literal("")),
+    password: z.string().min(1, "Password is required").or(z.literal("")),
+    passwordConfirmation: z.string().or(z.literal("")),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
     path: ["passwordConfirmation"],
