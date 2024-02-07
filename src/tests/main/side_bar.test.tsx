@@ -3,11 +3,11 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { ReactElement } from "react";
 import SideBar from "../../components/main/side_bar/side_bar";
-import { BrowserRouter } from "react-router-dom";
-import { act } from "react-dom/test-utils";
+import { BrowserRouter, MemoryRouter as Router } from "react-router-dom";
 import { AuthContext } from "../../contexts/authProvider";
 import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
+import { act } from "react-dom/test-utils";
 
 const customRender = (
   ui: ReactElement,
@@ -43,36 +43,45 @@ const userContext: authContextType = {
 
 describe("side bar component", () => {
   it("shows header", () => {
-    customRender(<SideBar />, userContext);
+    customRender(
+      <Router>
+        <SideBar />
+      </Router>,
+      userContext
+    );
 
     expect(
       screen.getByRole("heading", { name: "Messaging" })
     ).toBeInTheDocument();
   });
+
   it("changes message query upon click", async () => {
     const user = userEvent.setup();
-    await act(async () => {
-      customRender(
+
+    await act(() =>
+      render(
         <BrowserRouter>
           <SideBar />
-        </BrowserRouter>,
-        userContext
-      );
-    });
-    const userButton = screen.getByText(/user1/);
+        </BrowserRouter>
+      )
+    );
+
+    const userButton = await screen.findByText(/user1/);
 
     await user.click(userButton);
 
     expect(global.window.location.pathname).toBe("/user/1236");
   });
+
   it("Drop down menu to create groups shows upon click", async () => {
-    const user = userEvent.setup();
-    customRender(
-      <BrowserRouter>
-        <SideBar />
-      </BrowserRouter>,
-      userContext
+    await act(() =>
+      render(
+        <Router initialEntries={["/main"]}>
+          <SideBar />
+        </Router>
+      )
     );
+    const user = userEvent.setup();
     const dropDownBtn = screen.getByRole("button", { name: "+" });
 
     await user.click(dropDownBtn);
@@ -81,34 +90,39 @@ describe("side bar component", () => {
   });
   it("Drop down menu to create groups disappears when clicking somewhere else in doc", async () => {
     const user = userEvent.setup();
-    customRender(
-      <BrowserRouter>
-        <SideBar />
-      </BrowserRouter>,
-      userContext
+    await act(() =>
+      render(
+        <Router initialEntries={["/main"]}>
+          <SideBar />
+        </Router>
+      )
     );
+
     const dropDownBtn = screen.getByRole("button", { name: "+" });
 
     await user.click(dropDownBtn);
 
-    const join_button = screen.getByText(/Create Group/);
+    const joinButton = screen.getByText(/Create Group/);
 
-    expect(join_button).toBeInTheDocument();
+    expect(joinButton).toBeInTheDocument();
 
     const randomLocation = screen.getByRole("button", { name: "All" });
 
     await user.click(randomLocation);
 
-    expect(join_button).not.toBeInTheDocument();
+    expect(joinButton).not.toBeInTheDocument();
   });
   it("Drop down menu button will close create group menu when pressed again", async () => {
     const user = userEvent.setup();
-    customRender(
-      <BrowserRouter>
-        <SideBar />
-      </BrowserRouter>,
-      userContext
+
+    await act(() =>
+      render(
+        <Router initialEntries={["/main"]}>
+          <SideBar />
+        </Router>
+      )
     );
+
     const dropDownBtn = screen.getByRole("button", { name: "+" });
 
     await user.click(dropDownBtn);

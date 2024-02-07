@@ -4,6 +4,7 @@ import "./side_bar.css";
 import { Link, NavLink } from "react-router-dom";
 import useClickOutside from "../../../hooks/useClickOutside";
 import axios from "axios";
+import ProfilePic from "../profile_pic";
 
 function SideBar() {
   const [channelList, setChannelList] = useState([] as channelType[]);
@@ -101,9 +102,11 @@ function SideBar() {
                     className="channel"
                     key={channel.channelId}
                   >
-                    {channel.type == "group"
-                      ? `# ${channel.name}`
-                      : channel.name}
+                    {channel.type === "group" ? (
+                      `# ${channel.name}`
+                    ) : (
+                      <ProfilePic url="" size="18" userName={channel.name} />
+                    )}
                   </NavLink>
                 );
               }
@@ -114,9 +117,11 @@ function SideBar() {
                     className="channel"
                     key={channel.channelId}
                   >
-                    {channel.type === "group"
-                      ? `# ${channel.name}`
-                      : channel.name}
+                    {channel.type === "group" ? (
+                      `# ${channel.name}`
+                    ) : (
+                      <ProfilePic url="" size="20" userName={channel.name} />
+                    )}
                   </NavLink>
                 );
               }

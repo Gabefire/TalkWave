@@ -52,11 +52,17 @@ export default function MessageHeader() {
       <div className="messages-top-bar">
         <h2>{channel.name}</h2>
         {channel.isOwner || params.type == "user" ? (
-          <button className="message-header-btn delete" onClick={deleteChannel}>
+          <button
+            className="message-header-btn delete modal-button"
+            onClick={deleteChannel}
+          >
             Delete
           </button>
         ) : (
-          <button className="message-header-btn leave" onClick={leaveChannel}>
+          <button
+            className="message-header-btn leave modal-button"
+            onClick={leaveChannel}
+          >
             Leave
           </button>
         )}

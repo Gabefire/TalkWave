@@ -1,0 +1,12 @@
+.profile-pic {
+    border-radius: 50%;
+    border: 1px solid grey;
+    text-align: center;
+    font-weight: bolder;
+
+}
+
+.profile-container {
+    display: flex;
+    gap: 5px;
+}

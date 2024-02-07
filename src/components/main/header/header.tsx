@@ -10,6 +10,7 @@ import axios from "axios";
 import UserIcon from "./user_icon";
 import { TailSpin } from "react-loader-spinner";
 import useProvideAuth from "../../../hooks/useProvideAuth";
+import ProfilePic from "../profile_pic";
 
 function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
@@ -28,9 +29,9 @@ function Header() {
   const searchBarRef = useRef<HTMLInputElement>(null);
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
-  const user = useContext(AuthContext);
-
   const { logout } = useProvideAuth();
+
+  const user = useContext(AuthContext);
 
   // profile drop down
   useClickOutside(
@@ -97,8 +98,11 @@ function Header() {
           onClick={() => setDisplayJoinGroupMenu(!displayJoinGroupMenu)}
         >
           {/*Log in pic will need to go here when logic is added*/}
-          <img className="profile-pic" src="./" alt="Profile" />
-          <div className="name">{user.userName}</div>
+          <ProfilePic
+            url=""
+            size="20"
+            userName={user.userName?.toString() as string}
+          />
           {displayJoinGroupMenu ? (
             <div className="profile popover" ref={profilePopoverRef}>
               <div className="triangle"></div>
