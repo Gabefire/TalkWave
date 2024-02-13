@@ -15,7 +15,8 @@ function MainRoot() {
   useEffect(() => {
     if (!localStorage.getItem("auth")) {
       setValid(false);
-      navigate("/login");
+      console.error("No token present");
+      navigate("/");
     } else {
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + localStorage.getItem("auth");
