@@ -7,7 +7,9 @@ jobs:
   run:
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: us-east-2
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-2
     steps:
         - uses: actions/checkout@v1
 
@@ -20,8 +22,6 @@ jobs:
         - name: Deploy
           uses: lbertenasco/s3-deploy@v1
           with:
-            role-to-assume: arn:aws:iam::584742206045:oidc-provider/token.actions.githubusercontent.com
-            role-session-name: GitHub_to_AWS_via_FederatedOIDC
             folder: build
             bucket: ${{ secrets.S3_BUCKET }}
             dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
