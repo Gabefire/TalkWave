@@ -7,7 +7,7 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import { AuthContext } from "../../contexts/authProvider";
 import { ACTION_TYPE, channelListReducer } from "../../reducers/channelReducer";
 import { channelType } from "../../types/messages";
-import { createContext } from "vm";
+import { createContext } from "react";
 
 const initialState = [] as channelType[];
 type channelListContextType = {
