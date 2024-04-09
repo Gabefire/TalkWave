@@ -13,7 +13,7 @@ const initialState = [] as channelType[];
 type channelListContextType = {
   channelDispatch: channelType[];
   dispatch: React.Dispatch<ACTION_TYPE>;
-  changeLoading: () => void;
+  changeLoading: (loading: boolean) => void;
   loading: boolean;
 };
 
@@ -46,7 +46,12 @@ function MainRoot() {
 
   return (
     <ChannelListContext.Provider
-      value={{ channelDispatch, dispatch, channelsLoading, channelListLoading }}
+      value={{
+        channelDispatch,
+        dispatch,
+        changeLoading: channelsLoading,
+        loading: channelListLoading,
+      }}
     >
       {valid ? (
         <div className="app">
