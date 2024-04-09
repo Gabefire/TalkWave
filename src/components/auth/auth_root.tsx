@@ -1,23 +1,20 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import "./auth.css";
-import { useContext, useEffect } from "react";
-import { AuthContext } from "../../contexts/authProvider";
+import { useEffect } from "react";
 
 export default function AuthRoot() {
   const navigate = useNavigate();
-  const param = useParams();
-  const { token } = useContext(AuthContext);
+  const location = useLocation();
 
   useEffect(() => {
     const noRedirect = ["/edit-profile"];
     if (
       localStorage.getItem("auth") &&
-      typeof param === "string" &&
-      !(param in noRedirect)
+      !noRedirect.includes(location.pathname)
     ) {
       navigate("/main");
     }
-  }, [navigate, token, param]);
+  }, [location.pathname, navigate]);
   return (
     <div className="auth">
       <Outlet />
