@@ -13,6 +13,8 @@ const initialState = [] as channelType[];
 type channelListContextType = {
   channelDispatch: channelType[];
   dispatch: React.Dispatch<ACTION_TYPE>;
+  changeLoading: () => void;
+  loading: boolean;
 };
 
 const ChannelListContext = createContext({} as channelListContextType);
@@ -20,11 +22,16 @@ const ChannelListContext = createContext({} as channelListContextType);
 function MainRoot() {
   const navigate = useNavigate();
   const [valid, setValid] = useState(false);
+  const [channelListLoading, setChannelListLoading] = useState(false);
   const { token } = useContext(AuthContext);
   const [channelDispatch, dispatch] = useReducer(
     channelListReducer,
     initialState
   );
+
+  const channelsLoading = (loading: boolean) => {
+    setChannelListLoading(loading);
+  };
 
   useEffect(() => {
     if (!localStorage.getItem("auth")) {
@@ -38,7 +45,9 @@ function MainRoot() {
   }, [navigate, token]);
 
   return (
-    <ChannelListContext.Provider value={{ channelDispatch, dispatch }}>
+    <ChannelListContext.Provider
+      value={{ channelDispatch, dispatch, channelsLoading, channelListLoading }}
+    >
       {valid ? (
         <div className="app">
           <Header />
