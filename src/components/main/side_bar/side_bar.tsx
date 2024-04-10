@@ -7,6 +7,7 @@ import axios from "axios";
 import ProfilePic from "../profile_pic";
 import ChannelListContext from "../../../contexts/channelListContext";
 import { ACTION } from "../../../reducers/channelReducer";
+import { TailSpin } from "react-loader-spinner";
 
 function SideBar() {
   const [activeButton, setActiveButton] = useState(
@@ -99,44 +100,62 @@ function SideBar() {
           Groups
         </button>
       </div>
-      {!loading ? (
-        <div className="channels">
-          {channelDispatch.length > 0
-            ? channelDispatch.map((channel) => {
-                if (activeButton === "all") {
-                  return (
-                    <NavLink
-                      to={`${channel.type}/${channel.channelId}`}
-                      className="channel"
-                      key={channel.channelId}
-                    >
-                      {channel.type === "group" ? (
-                        `# ${channel.name}`
-                      ) : (
-                        <ProfilePic url="" size="18" userName={channel.name} />
-                      )}
-                    </NavLink>
-                  );
-                }
-                if (activeButton === channel.type) {
-                  return (
-                    <NavLink
-                      to={`${channel.type}/${channel.channelId}`}
-                      className="channel"
-                      key={channel.channelId}
-                    >
-                      {channel.type === "group" ? (
-                        `# ${channel.name}`
-                      ) : (
-                        <ProfilePic url="" size="20" userName={channel.name} />
-                      )}
-                    </NavLink>
-                  );
-                }
-              })
-            : "No channels Found"}
-        </div>
-      ) : undefined}
+      <div className="channels">
+        {!loading ? (
+          <>
+            {channelDispatch.length > 0
+              ? channelDispatch.map((channel) => {
+                  if (activeButton === "all") {
+                    return (
+                      <NavLink
+                        to={`${channel.type}/${channel.channelId}`}
+                        className="channel"
+                        key={channel.channelId}
+                      >
+                        {channel.type === "group" ? (
+                          `# ${channel.name}`
+                        ) : (
+                          <ProfilePic
+                            url=""
+                            size="18"
+                            userName={channel.name}
+                          />
+                        )}
+                      </NavLink>
+                    );
+                  }
+                  if (activeButton === channel.type) {
+                    return (
+                      <NavLink
+                        to={`${channel.type}/${channel.channelId}`}
+                        className="channel"
+                        key={channel.channelId}
+                      >
+                        {channel.type === "group" ? (
+                          `# ${channel.name}`
+                        ) : (
+                          <ProfilePic
+                            url=""
+                            size="20"
+                            userName={channel.name}
+                          />
+                        )}
+                      </NavLink>
+                    );
+                  }
+                })
+              : "No channels Found"}
+          </>
+        ) : (
+          <TailSpin
+            height="40"
+            width="40"
+            color="white"
+            ariaLabel="tail-spin-loading"
+            wrapperClass="load-channel"
+          />
+        )}
+      </div>
     </div>
   );
 }
