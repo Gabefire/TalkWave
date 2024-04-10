@@ -2,8 +2,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axios from "axios";
-import { groupChannelDto } from "../../../types/messages";
+import { channelType, groupChannelDto } from "../../../types/messages";
 import { useNavigate } from "react-router-dom";
+import ChannelListContext from "../../../contexts/channelListContext";
+import { useContext } from "react";
+import { ACTION } from "../../../reducers/channelReducer";
 
 const sendGroupChannelFormSchema = z.object({
   name: z.string().min(1),
@@ -25,10 +28,13 @@ function CreateGroup() {
 
   const navigate = useNavigate();
 
+  const { dispatch, changeLoading } = useContext(ChannelListContext);
+
   const onSubmit: SubmitHandler<sendGroupChannelFormSchemaType> = async ({
     name,
   }) => {
     try {
+      changeLoading(true);
       const results = (
         await axios.post<groupChannelDto>("/api/GroupChannel", {
           name,
@@ -37,9 +43,24 @@ function CreateGroup() {
       ).data;
       await axios.put(`/api/GroupChannel/join/${results.channelId}`);
       reset();
+      const channel: channelType = {
+        name: results.name,
+        type: "group",
+        isOwner: true,
+        channelId: results.channelId.toString(),
+        channelPicLink: results.channelPicLink,
+      };
+      dispatch({
+        type: ACTION.ADD_CHANNELS,
+        payload: {
+          channels: [channel],
+        },
+      });
       navigate(`/main/group/${results.channelId}`);
     } catch (error) {
       console.log(error);
+    } finally {
+      changeLoading(false);
     }
   };
   return (

@@ -105,3 +105,9 @@
     text-decoration: underline;
     cursor: default;
 }
+
+.load-channel {
+    align-self: center;
+    position: absolute;
+    top: 30%;
+}
