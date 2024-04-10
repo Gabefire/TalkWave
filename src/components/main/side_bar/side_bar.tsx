@@ -1,17 +1,20 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { channelType } from "../../../types/messages";
 import "./side_bar.css";
 import { Link, NavLink } from "react-router-dom";
 import useClickOutside from "../../../hooks/useClickOutside";
 import axios from "axios";
 import ProfilePic from "../profile_pic";
+import ChannelListContext from "../../../contexts/channelListContext";
+import { ACTION } from "../../../reducers/channelReducer";
 
 function SideBar() {
-  const [channelList, setChannelList] = useState([] as channelType[]);
   const [activeButton, setActiveButton] = useState(
     "all" as "all" | "user" | "group"
   );
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
+  const { dispatch, channelDispatch, loading, changeLoading } =
+    useContext(ChannelListContext);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const additionalRef = useRef<HTMLButtonElement>(null);
@@ -27,13 +30,17 @@ function SideBar() {
     const getChannels = async () => {
       try {
         const channelList = await axios.get<channelType[]>("/api/Channel");
-        setChannelList(channelList.data);
+        dispatch({
+          type: ACTION.SET_CHANNELS,
+          payload: { channels: channelList.data },
+        });
+        changeLoading(false);
       } catch (error) {
         console.log(error);
       }
     };
     getChannels();
-  }, []);
+  }, [dispatch, changeLoading]);
 
   return (
     <div className="side-bar">
@@ -92,42 +99,44 @@ function SideBar() {
           Groups
         </button>
       </div>
-      <div className="channels">
-        {channelList.length > 0
-          ? channelList.map((channel) => {
-              if (activeButton === "all") {
-                return (
-                  <NavLink
-                    to={`${channel.type}/${channel.channelId}`}
-                    className="channel"
-                    key={channel.channelId}
-                  >
-                    {channel.type === "group" ? (
-                      `# ${channel.name}`
-                    ) : (
-                      <ProfilePic url="" size="18" userName={channel.name} />
-                    )}
-                  </NavLink>
-                );
-              }
-              if (activeButton === channel.type) {
-                return (
-                  <NavLink
-                    to={`${channel.type}/${channel.channelId}`}
-                    className="channel"
-                    key={channel.channelId}
-                  >
-                    {channel.type === "group" ? (
-                      `# ${channel.name}`
-                    ) : (
-                      <ProfilePic url="" size="20" userName={channel.name} />
-                    )}
-                  </NavLink>
-                );
-              }
-            })
-          : "No channels Found"}
-      </div>
+      {!loading ? (
+        <div className="channels">
+          {channelDispatch.length > 0
+            ? channelDispatch.map((channel) => {
+                if (activeButton === "all") {
+                  return (
+                    <NavLink
+                      to={`${channel.type}/${channel.channelId}`}
+                      className="channel"
+                      key={channel.channelId}
+                    >
+                      {channel.type === "group" ? (
+                        `# ${channel.name}`
+                      ) : (
+                        <ProfilePic url="" size="18" userName={channel.name} />
+                      )}
+                    </NavLink>
+                  );
+                }
+                if (activeButton === channel.type) {
+                  return (
+                    <NavLink
+                      to={`${channel.type}/${channel.channelId}`}
+                      className="channel"
+                      key={channel.channelId}
+                    >
+                      {channel.type === "group" ? (
+                        `# ${channel.name}`
+                      ) : (
+                        <ProfilePic url="" size="20" userName={channel.name} />
+                      )}
+                    </NavLink>
+                  );
+                }
+              })
+            : "No channels Found"}
+        </div>
+      ) : undefined}
     </div>
   );
 }
