@@ -1,15 +1,17 @@
 import { channelType } from "../types/messages";
 
 export const ACTION = {
-    SET_CHANNEL: "set_channel",
-    ADD_CHANNEL: "add-channel",
-    DELETE_CHANNEL: "delete-post",
-    LEAVE_CHANNEL: "leave_channel",
+    SET_CHANNELS: "set_channel",
+    ADD_CHANNELS: "add-channel",
+    DELETE_CHANNELS: "delete-post",
+    LEAVE_CHANNELS: "leave_channel",
     };
   
 export type ACTION_TYPE = {
     type: string;
-    payload: channelType;
+    payload: {
+        channels: channelType[],
+    };
     };
 
 export function channelListReducer(
@@ -17,17 +19,26 @@ channels: channelType[],
 action: ACTION_TYPE
 ): channelType[] {
     switch (action.type) {
-        case ACTION.SET_CHANNEL:
+        case ACTION.SET_CHANNELS:
+            channels = action.payload.channels
             return channels
-        case ACTION.ADD_CHANNEL:
-            return channels.concat(action.payload);
-        case ACTION.DELETE_CHANNEL:
+        case ACTION.ADD_CHANNELS:
+            return channels.concat(action.payload.channels)
+        case ACTION.DELETE_CHANNELS:
             return channels.filter(
-                (channel) => channel.channelId != action.payload.channelId
+                (channel) => {
+                    action.payload.channels.forEach(
+                        (action_channel) => channel.channelId == action_channel.channelId
+                    )
+                }
             );
-        case ACTION.LEAVE_CHANNEL:
+        case ACTION.LEAVE_CHANNELS:
             return channels.filter(
-                (channel) => channel.channelId != action.payload.channelId
+                (channel) => {
+                    action.payload.channels.forEach(
+                        (action_channel) => channel.channelId == action_channel.channelId
+                    )
+                }
             );
         default:
             return channels
