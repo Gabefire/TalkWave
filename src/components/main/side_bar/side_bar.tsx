@@ -16,7 +16,6 @@ function SideBar() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
   const { dispatch, channelDispatch, loading, changeLoading } =
     useContext(ChannelListContext);
-
   const wrapperRef = useRef<HTMLDivElement>(null);
   const additionalRef = useRef<HTMLButtonElement>(null);
   useClickOutside(
@@ -41,7 +40,8 @@ function SideBar() {
       }
     };
     getChannels();
-  }, [dispatch, changeLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="side-bar">
