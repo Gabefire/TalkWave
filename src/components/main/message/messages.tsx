@@ -64,7 +64,7 @@ function Messages() {
 
   return (
     <div className="message-body">
-      {!isConnected ? (
+      {!isConnected && message === null ? (
         <TailSpin
           height="40"
           width="40"

@@ -47,7 +47,7 @@ function CreateGroup() {
         name: results.name,
         type: "group",
         isOwner: true,
-        channelId: results.channelId.toString(),
+        channelId: results.channelId,
         channelPicLink: results.channelPicLink,
       };
       dispatch({

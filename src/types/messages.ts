@@ -21,7 +21,7 @@ export interface messageQueryType {
 export interface channelType {
   name: string;
   type: "user" | "group";
-  channelId: string;
+  channelId: number;
   isOwner: boolean;
   channelPicLink?: string 
 }
