@@ -11,6 +11,8 @@ import UserIcon from "./user_icon";
 import { TailSpin } from "react-loader-spinner";
 import useProvideAuth from "../../../hooks/useProvideAuth";
 import ProfilePic from "../profile_pic";
+import ChannelListContext from "../../../contexts/channelListContext";
+import { ACTION } from "../../../reducers/channelReducer";
 
 function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);
@@ -32,6 +34,8 @@ function Header() {
   const { logout } = useProvideAuth();
 
   const user = useContext(AuthContext);
+
+  const { dispatch, changeLoading } = useContext(ChannelListContext);
 
   // profile drop down
   useClickOutside(
@@ -80,11 +84,22 @@ function Header() {
     };
   }, [searchTerm]);
 
-  const joinGroupChannel = async (channelId: string) => {
+  const joinGroupChannel = async (channel: channelType) => {
     try {
-      await axios.put(`/api/GroupChannel/join/${channelId}`);
+      changeLoading(true);
+      await axios.put<channelType>(
+        `/api/GroupChannel/join/${channel.channelId}`
+      );
+      dispatch({
+        type: ACTION.ADD_CHANNELS,
+        payload: {
+          channels: [channel],
+        },
+      });
     } catch (err) {
       console.log(err);
+    } finally {
+      changeLoading(false);
     }
   };
 
@@ -171,7 +186,7 @@ function Header() {
                               <Link
                                 to={`${channel.type}/${channel.channelId}`}
                                 onClick={async (e) => {
-                                  await joinGroupChannel(channel.channelId);
+                                  await joinGroupChannel(channel);
                                   if (e) setSearchTerm("");
                                 }}
                                 key={channel.channelId}
