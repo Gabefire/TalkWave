@@ -33,5 +33,6 @@ jobs:
     
         - name: Deploy static site to S3 bucket and Invalidate Cloudfront
           run: |
-              aws s3 sync ./dist/ s3://talkwaveapp.com --delete
+              aws s3 sync ./dist/ s3://talkwaveapp.com --delete --exclude "*.js"
+              aws s3 sync ./dist/ s3://talkwaveapp.com --delete --include "*.js" --content-type "application/javascript"
               aws cloudfront create-invalidation --distribution-id EPXIDMMOSTZ5B --paths "/*"
