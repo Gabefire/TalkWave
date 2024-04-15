@@ -27,25 +27,25 @@ const messageList: messageType[] = [
     {
       type: "group",
       name: "group1",
-      channelId: "1",
+      channelId: 1,
       isOwner: true,
     },
     {
       type: "group",
       name: "group2",
-      channelId: "1235",
+      channelId: 1235,
       isOwner: true,
     },
     {
       type: "user",
       name: "user1",
-      channelId: "1236",
+      channelId: 1236,
       isOwner: true,
     },
     {
       type: "user",
       name: "user2",
-      channelId: "1237",
+      channelId: 1237,
       isOwner: true,
     },
   ];
@@ -53,7 +53,7 @@ const messageList: messageType[] = [
 const channel: channelType = {
     name: "test",
     type: "user",
-    channelId: "1",
+    channelId: 1,
     isOwner: true,
   }
 
@@ -65,13 +65,13 @@ const userDto: loginUserDtoType = {
 const groupSearchResults: channelType[] =[
     {
         name: "group1",
-        channelId: "1234",
+        channelId: 1234,
         type: "group",
         isOwner: true,
       },
       {
         name: "group2",
-        channelId: "12345",
+        channelId: 12345,
         type: "group",
         isOwner: true,
       },

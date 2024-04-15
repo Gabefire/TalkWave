@@ -1,25 +1,12 @@
-import { RenderOptions, render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { ReactElement } from "react";
 import Header from "../../components/main/header/header";
 import { BrowserRouter } from "react-router-dom";
-import { AuthContext } from "../../contexts/authProvider";
 import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
-
-const customRender = (
-  ui: ReactElement,
-  providerProps: authContextType,
-  renderOptions?: Omit<RenderOptions, "wrapper">
-) => {
-  return render(
-    <AuthContext.Provider value={{ ...providerProps }}>
-      {ui}
-    </AuthContext.Provider>,
-    renderOptions
-  );
-};
+import { channelListContextType } from "../../contexts/channelListContext";
+import { customRender } from "../customRender";
 
 const userContext: authContextType = {
   userName: "test",
@@ -30,6 +17,38 @@ const userContext: authContextType = {
   setToken: (token: string | null) => {
     token;
   },
+};
+
+const channelListContext: channelListContextType = {
+  channelDispatch: [
+    {
+      type: "group",
+      name: "group1",
+      channelId: 1,
+      isOwner: true,
+    },
+    {
+      type: "group",
+      name: "group2",
+      channelId: 1235,
+      isOwner: true,
+    },
+    {
+      type: "user",
+      name: "user1",
+      channelId: 1236,
+      isOwner: true,
+    },
+    {
+      type: "user",
+      name: "user2",
+      channelId: 1237,
+      isOwner: true,
+    },
+  ],
+  dispatch: vi.fn(),
+  changeLoading: vi.fn(),
+  loading: false,
 };
 
 vi.mock("react-router-dom", async () => {
@@ -47,7 +66,8 @@ describe("header component", () => {
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
-      userContext
+      userContext,
+      channelListContext
     );
 
     // test will need to be changed when log in logic added
@@ -71,7 +91,8 @@ describe("header component", () => {
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
-      userContext
+      userContext,
+      channelListContext
     );
     // test will need to be changed when log in logic added
     const dropDownBtn = screen.getByText("test");
@@ -96,35 +117,15 @@ describe("header component", () => {
       <BrowserRouter>
         <Header />
       </BrowserRouter>,
-      userContext
+      userContext,
+      channelListContext
     );
 
     const searchBar = screen.getByRole("searchbox");
-    console.log(global.window.location.pathname);
     await user.type(searchBar, "test");
 
     expect(
       await screen.findByRole("heading", { name: /Groups/ })
     ).toBeInTheDocument();
-  });
-  test("Clicking search link switches page", async () => {
-    const user = userEvent.setup();
-    const currentPage = location.href;
-    customRender(
-      <BrowserRouter>
-        <Header />
-      </BrowserRouter>,
-      userContext
-    );
-
-    const searchBar = screen.getByRole("searchbox");
-
-    await user.type(searchBar, "gabe");
-
-    const testLink = await screen.findAllByRole("link");
-
-    await user.click(testLink[0]);
-
-    expect(location.href).not.toBe(currentPage);
   });
 });

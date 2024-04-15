@@ -12,8 +12,6 @@ interface userIconType {
 function UserIcon({ user }: userIconType) {
   const navigator = useNavigate();
 
-  console.log(user);
-
   const { dispatch, changeLoading } = useContext(ChannelListContext);
 
   const checkUserChannel = async (requestedUserId: string) => {

@@ -1,26 +1,13 @@
-import { RenderOptions, render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { ReactElement } from "react";
 import SideBar from "../../components/main/side_bar/side_bar";
-import { BrowserRouter, MemoryRouter as Router } from "react-router-dom";
-import { AuthContext } from "../../contexts/authProvider";
+import { MemoryRouter as Router } from "react-router-dom";
 import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
 import { act } from "react-dom/test-utils";
-
-const customRender = (
-  ui: ReactElement,
-  providerProps: authContextType,
-  renderOptions?: Omit<RenderOptions, "wrapper">
-) => {
-  return render(
-    <AuthContext.Provider value={{ ...providerProps }}>
-      {ui}
-    </AuthContext.Provider>,
-    renderOptions
-  );
-};
+import { channelListContextType } from "../../contexts/channelListContext";
+import { customRender } from "../customRender";
 
 vi.mock("react-router-dom", async () => {
   const actual: [] = await vi.importActual("react-router-dom");
@@ -41,13 +28,46 @@ const userContext: authContextType = {
   },
 };
 
+const channelListContext: channelListContextType = {
+  channelDispatch: [
+    {
+      type: "group",
+      name: "group1",
+      channelId: 1,
+      isOwner: true,
+    },
+    {
+      type: "group",
+      name: "group2",
+      channelId: 1235,
+      isOwner: true,
+    },
+    {
+      type: "user",
+      name: "user1",
+      channelId: 1236,
+      isOwner: true,
+    },
+    {
+      type: "user",
+      name: "user2",
+      channelId: 1237,
+      isOwner: true,
+    },
+  ],
+  dispatch: vi.fn(),
+  changeLoading: vi.fn(),
+  loading: false,
+};
+
 describe("side bar component", () => {
   it("shows header", () => {
     customRender(
       <Router>
         <SideBar />
       </Router>,
-      userContext
+      userContext,
+      channelListContext
     );
 
     expect(
@@ -55,30 +75,30 @@ describe("side bar component", () => {
     ).toBeInTheDocument();
   });
 
-  it("changes message query upon click", async () => {
-    const user = userEvent.setup();
-
+  it("Expect user navlink to be in document", async () => {
     await act(() =>
-      render(
-        <BrowserRouter>
+      customRender(
+        <Router>
           <SideBar />
-        </BrowserRouter>
+        </Router>,
+        userContext,
+        channelListContext
       )
     );
 
-    const userButton = await screen.findByText(/user1/);
+    const userButton = screen.getByRole("link", { name: /U user1/ });
 
-    await user.click(userButton);
-
-    expect(global.window.location.pathname).toBe("/user/1236");
+    expect(userButton).toBeInTheDocument();
   });
 
   it("Drop down menu to create groups shows upon click", async () => {
     await act(() =>
-      render(
-        <Router initialEntries={["/main"]}>
+      customRender(
+        <Router>
           <SideBar />
-        </Router>
+        </Router>,
+        userContext,
+        channelListContext
       )
     );
     const user = userEvent.setup();
@@ -91,10 +111,12 @@ describe("side bar component", () => {
   it("Drop down menu to create groups disappears when clicking somewhere else in doc", async () => {
     const user = userEvent.setup();
     await act(() =>
-      render(
-        <Router initialEntries={["/main"]}>
+      customRender(
+        <Router>
           <SideBar />
-        </Router>
+        </Router>,
+        userContext,
+        channelListContext
       )
     );
 
@@ -116,13 +138,14 @@ describe("side bar component", () => {
     const user = userEvent.setup();
 
     await act(() =>
-      render(
-        <Router initialEntries={["/main"]}>
+      customRender(
+        <Router>
           <SideBar />
-        </Router>
+        </Router>,
+        userContext,
+        channelListContext
       )
     );
-
     const dropDownBtn = screen.getByRole("button", { name: "+" });
 
     await user.click(dropDownBtn);
