@@ -124,6 +124,7 @@
     border: none;
     background-color: transparent;
     text-align: left;
+    cursor: pointer;
 }
 
 .load-search {

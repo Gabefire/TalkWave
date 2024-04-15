@@ -1,12 +1,12 @@
 /// <reference types="vite-plugin-svgr/client" />
 import { useState, useRef, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useClickOutside from "../../../hooks/useClickOutside";
 import SearchIcon from "../../../assets/magnify.svg?react";
 import { channelType, userSearchDto } from "../../../types/messages";
 import "./header.css";
 import { AuthContext } from "../../../contexts/authProvider";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import UserIcon from "./user_icon";
 import { TailSpin } from "react-loader-spinner";
 import useProvideAuth from "../../../hooks/useProvideAuth";
@@ -25,6 +25,8 @@ function Header() {
     [] as userSearchDto[]
   );
   const [loadingSearchResults, setLoadingSearchResults] = useState(true);
+
+  const navigator = useNavigate();
 
   const profilePopoverRef = useRef<HTMLDivElement>(null);
   const profileBoxRef = useRef<HTMLDivElement>(null);
@@ -87,17 +89,20 @@ function Header() {
   const joinGroupChannel = async (channel: channelType) => {
     try {
       changeLoading(true);
-      await axios.put<channelType>(
-        `/api/GroupChannel/join/${channel.channelId}`
-      );
+      await axios.put(`/api/GroupChannel/join/${channel.channelId}`);
       dispatch({
         type: ACTION.ADD_CHANNELS,
         payload: {
           channels: [channel],
         },
       });
+      navigator(`${channel.type}/${channel.channelId}`);
     } catch (err) {
-      console.log(err);
+      if (isAxiosError(err) && err.response?.status === 409) {
+        navigator(`${channel.type}/${channel.channelId}`);
+      } else {
+        console.error(err);
+      }
     } finally {
       changeLoading(false);
     }
@@ -183,16 +188,16 @@ function Header() {
                         groupSearchResults.map((channel) => {
                           if (channel.type == "group") {
                             return (
-                              <Link
-                                to={`${channel.type}/${channel.channelId}`}
+                              <button
                                 onClick={async (e) => {
                                   await joinGroupChannel(channel);
                                   if (e) setSearchTerm("");
                                 }}
                                 key={channel.channelId}
+                                className="user-icon"
                               >
                                 {`# ${channel.name}`}
-                              </Link>
+                              </button>
                             );
                           }
                         })
