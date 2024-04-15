@@ -58,7 +58,7 @@ function CreateGroup() {
       });
       navigate(`/main/group/${results.channelId}`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       changeLoading(false);
     }

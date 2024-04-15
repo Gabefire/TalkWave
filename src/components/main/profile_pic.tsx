@@ -10,7 +10,6 @@ interface ProfilePicType {
 
 function ProfilePic({ url, size, userName }: ProfilePicType) {
   const [color, setColor] = useState("green");
-
   useEffect(() => {
     const letters = "0123456789ABCDEF";
     let color = "#";
@@ -35,7 +34,9 @@ function ProfilePic({ url, size, userName }: ProfilePicType) {
               padding: "1px",
             }}
           >
-            {Array.from(userName)[0].toUpperCase()}
+            {userName.length > 0
+              ? Array.from(userName)[0].toUpperCase()
+              : undefined}
           </div>
           {userName}
         </div>
