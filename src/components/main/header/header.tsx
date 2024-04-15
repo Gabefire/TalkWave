@@ -72,7 +72,7 @@ function Header() {
         setUserSearchResults(results[1]);
         setLoadingSearchResults(false);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
     if (!searchTerm) {

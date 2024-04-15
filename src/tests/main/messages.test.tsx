@@ -1,27 +1,14 @@
-import { RenderOptions, render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { ReactElement } from "react";
 import { authContextType } from "../../types/auth";
-import { AuthContext } from "../../contexts/authProvider";
 import { vi } from "vitest";
 import { act } from "react-dom/test-utils";
 import MessageHeader from "../../components/main/message/message_header";
 import MessageBody from "../../components/main/message/message_body";
 import MessageSend from "../../components/main/message/message_send";
-
-const customRender = (
-  ui: ReactElement,
-  providerProps: authContextType,
-  renderOptions?: Omit<RenderOptions, "wrapper">
-) => {
-  return render(
-    <AuthContext.Provider value={{ ...providerProps }}>
-      {ui}
-    </AuthContext.Provider>,
-    renderOptions
-  );
-};
+import { customRender } from "../customRender";
+import { channelListContextType } from "../../contexts/channelListContext";
 
 const userContext: authContextType = {
   userName: "test",
@@ -32,6 +19,38 @@ const userContext: authContextType = {
   setToken: (token: string | null) => {
     token;
   },
+};
+
+const channelListContext: channelListContextType = {
+  channelDispatch: [
+    {
+      type: "group",
+      name: "group1",
+      channelId: 1,
+      isOwner: true,
+    },
+    {
+      type: "group",
+      name: "group2",
+      channelId: 1235,
+      isOwner: true,
+    },
+    {
+      type: "user",
+      name: "user1",
+      channelId: 1236,
+      isOwner: true,
+    },
+    {
+      type: "user",
+      name: "user2",
+      channelId: 1237,
+      isOwner: true,
+    },
+  ],
+  dispatch: vi.fn(),
+  changeLoading: vi.fn(),
+  loading: false,
 };
 
 vi.mock("react-router-dom", () => ({
@@ -47,7 +66,9 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 describe("Message Header", () => {
   test("Switches url when delete button is hit", async () => {
-    await act(async () => customRender(<MessageHeader />, userContext));
+    await act(async () =>
+      customRender(<MessageHeader />, userContext, channelListContext)
+    );
 
     const user = userEvent.setup();
     const button = screen.getByRole("button", { name: "Delete" });
@@ -58,7 +79,9 @@ describe("Message Header", () => {
   });
 
   test("Header is shown", async () => {
-    await act(async () => customRender(<MessageHeader />, userContext));
+    await act(async () =>
+      customRender(<MessageHeader />, userContext, channelListContext)
+    );
 
     expect(screen.getByRole("heading", { name: "test" })).toBeInTheDocument();
   });
@@ -68,7 +91,11 @@ describe("Message Body", () => {
   test("Message is shown", async () => {
     await act(async () => {
       const message = null;
-      customRender(<MessageBody message={message} />, userContext);
+      customRender(
+        <MessageBody message={message} />,
+        userContext,
+        channelListContext
+      );
     });
 
     const message = screen.getByText(/Hi this is Gabe/);
@@ -83,7 +110,11 @@ describe("Message Body", () => {
         CreatedAt: new Date().toString(),
         IsOwner: false,
       };
-      customRender(<MessageBody message={message} />, userContext);
+      customRender(
+        <MessageBody message={message} />,
+        userContext,
+        channelListContext
+      );
     });
   });
 });
@@ -91,7 +122,7 @@ describe("Message Body", () => {
 describe("Message Send", () => {
   test("Message is posted when click button is hit with text included", async () => {
     const post = vi.fn();
-    customRender(<MessageSend post={post} />, userContext);
+    customRender(<MessageSend post={post} />, userContext, channelListContext);
 
     const user = userEvent.setup();
     const message = screen.getByRole("textbox", { name: "message" });
@@ -105,7 +136,7 @@ describe("Message Send", () => {
 
   test("Message is not posted when click button is hit with text not included", async () => {
     const post = vi.fn();
-    customRender(<MessageSend post={post} />, userContext);
+    customRender(<MessageSend post={post} />, userContext, channelListContext);
 
     const user = userEvent.setup();
     const button = screen.getByRole("button", { name: "Send" });
