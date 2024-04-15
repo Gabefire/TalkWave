@@ -1,13 +1,13 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import "./main.css";
-import Header from "./header/header";
-import SideBar from "./side_bar/side_bar";
+import Header from "./header/header.tsx";
+import SideBar from "./side_bar/side_bar.tsx";
 import axios from "axios";
 import { useContext, useEffect, useReducer, useState } from "react";
 import { AuthContext } from "../../contexts/authProvider";
-import { channelListReducer } from "../../reducers/channelReducer";
-import { channelType } from "../../types/messages";
-import ChannelListContext from "../../contexts/channelListContext";
+import { channelListReducer } from "../../reducers/channelReducer.ts";
+import { channelType } from "../../types/messages.tsx";
+import ChannelListContext from "../../contexts/channelListContext.ts";
 
 const initialState = [] as channelType[];
 

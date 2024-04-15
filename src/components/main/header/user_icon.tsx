@@ -1,10 +1,10 @@
 import axios from "axios";
-import { channelType, userSearchDto } from "../../../types/messages";
+import { channelType, userSearchDto } from "../../../types/messages.ts";
 import { useNavigate } from "react-router-dom";
 import ProfilePic from "../profile_pic";
-import { ACTION } from "../../../reducers/channelReducer";
+import { ACTION } from "../../../reducers/channelReducer.ts";
 import { useContext } from "react";
-import ChannelListContext from "../../../contexts/channelListContext";
+import ChannelListContext from "../../../contexts/channelListContext.ts";
 
 interface userIconType {
   user: userSearchDto;

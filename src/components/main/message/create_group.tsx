@@ -2,11 +2,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axios from "axios";
-import { channelType, groupChannelDto } from "../../../types/messages";
+import { channelType, groupChannelDto } from "../../../types/messages.ts";
 import { useNavigate } from "react-router-dom";
-import ChannelListContext from "../../../contexts/channelListContext";
+import ChannelListContext from "../../../contexts/channelListContext.ts";
 import { useContext } from "react";
-import { ACTION } from "../../../reducers/channelReducer";
+import { ACTION } from "../../../reducers/channelReducer.ts";
 
 const sendGroupChannelFormSchema = z.object({
   name: z.string().min(1),

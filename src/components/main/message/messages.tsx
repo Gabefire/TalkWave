@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { messageTypeDto } from "../../../types/messages";
-import MessageBody from "./message_body";
+import { messageTypeDto } from "../../../types/messages.ts";
+import MessageBody from "./message_body.tsx";
 import "./messages.css";
 import { useParams } from "react-router-dom";
-import { AuthContext } from "../../../contexts/authProvider";
-import MessageHeader from "./message_header";
+import { AuthContext } from "../../../contexts/authProvider.tsx";
+import MessageHeader from "./message_header.tsx";
 import { TailSpin } from "react-loader-spinner";
-import MessageSend from "./message_send";
+import MessageSend from "./message_send.tsx";
 
 function Messages() {
   const [socket, setSocket] = useState(null as null | WebSocket);

@@ -1,18 +1,18 @@
 /// <reference types="vite-plugin-svgr/client" />
 import { useState, useRef, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useClickOutside from "../../../hooks/useClickOutside";
+import useClickOutside from "../../../hooks/useClickOutside.tsx";
 import SearchIcon from "../../../assets/magnify.svg?react";
-import { channelType, userSearchDto } from "../../../types/messages";
+import { channelType, userSearchDto } from "../../../types/messages.ts";
 import "./header.css";
-import { AuthContext } from "../../../contexts/authProvider";
+import { AuthContext } from "../../../contexts/authProvider.tsx";
 import axios, { isAxiosError } from "axios";
 import UserIcon from "./user_icon";
 import { TailSpin } from "react-loader-spinner";
-import useProvideAuth from "../../../hooks/useProvideAuth";
+import useProvideAuth from "../../../hooks/useProvideAuth.tsx";
 import ProfilePic from "../profile_pic";
-import ChannelListContext from "../../../contexts/channelListContext";
-import { ACTION } from "../../../reducers/channelReducer";
+import ChannelListContext from "../../../contexts/channelListContext.ts";
+import { ACTION } from "../../../reducers/channelReducer.ts";
 
 function Header() {
   const [displayJoinGroupMenu, setDisplayJoinGroupMenu] = useState(false);

@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { channelType } from "../../../types/messages";
+import { channelType } from "../../../types/messages.ts";
 import "./side_bar.css";
 import { Link, NavLink } from "react-router-dom";
-import useClickOutside from "../../../hooks/useClickOutside";
+import useClickOutside from "../../../hooks/useClickOutside.tsx";
 import axios from "axios";
-import ProfilePic from "../profile_pic";
-import ChannelListContext from "../../../contexts/channelListContext";
-import { ACTION } from "../../../reducers/channelReducer";
+import ProfilePic from "../profile_pic.tsx";
+import ChannelListContext from "../../../contexts/channelListContext.ts";
+import { ACTION } from "../../../reducers/channelReducer.ts";
 import { TailSpin } from "react-loader-spinner";
 
 function SideBar() {

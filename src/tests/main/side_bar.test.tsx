@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import SideBar from "../../components/main/side_bar/side_bar";
+import SideBar from "../../components/main/side_bar/side_bar.tsx";
 import { MemoryRouter as Router } from "react-router-dom";
 import { authContextType } from "../../types/auth";
 import { vi } from "vitest";

@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { channelType } from "../../../types/messages";
+import { channelType } from "../../../types/messages.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import ChannelListContext from "../../../contexts/channelListContext";
-import { ACTION } from "../../../reducers/channelReducer";
+import ChannelListContext from "../../../contexts/channelListContext.ts";
+import { ACTION } from "../../../reducers/channelReducer.ts";
 
 export default function MessageHeader() {
   const [channel, setChannel] = useState<null | channelType>(null);

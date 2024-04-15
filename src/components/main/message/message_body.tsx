@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { messageType, messageTypeDto } from "../../../types/messages";
-import dateConverter from "../dateConverter";
+import { messageType, messageTypeDto } from "../../../types/messages.ts";
+import dateConverter from "../dateConverter.ts";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
