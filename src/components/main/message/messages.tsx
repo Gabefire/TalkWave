@@ -7,54 +7,51 @@ import { AuthContext } from "../../../contexts/authProvider.tsx";
 import MessageHeader from "./message_header.tsx";
 import { TailSpin } from "react-loader-spinner";
 import MessageSend from "./message_send.tsx";
+import * as signalR from "@microsoft/signalr";
 
 function Messages() {
-  const [socket, setSocket] = useState(null as null | WebSocket);
+  const [connection, setConnection] = useState(
+    null as null | signalR.HubConnection
+  );
   const [isConnected, setIsConnected] = useState(false);
   const [message, setMessage] = useState(null as null | messageTypeDto);
 
   const params = useParams();
   const user = useContext(AuthContext);
   useEffect(() => {
-    const socket = new WebSocket(
-      `${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message/${params.type}/${
-        params.id
-      }?authorization=${user.token}`
-    );
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Messages`, {
+        accessTokenFactory: () => user.token as string,
+      })
+      .build();
 
-    socket.onopen = () => {
+    connection.on("open", () => {
       setTimeout(() => setIsConnected(true), 1000);
-    };
-    socket.onclose = () => {
+    });
+
+    connection.onclose = () => {
       setIsConnected(false);
     };
-    socket.onerror = () => {
-      setIsConnected(false);
-      socket.close();
-    };
-    socket.onmessage = (event) => {
-      (event.data as Blob).text().then((resultString) => {
+
+    connection.on("ReceiveMessage,", (message) => {
+      (message.data as Blob).text().then((resultString) => {
         const result: messageTypeDto = JSON.parse(resultString);
         setMessage(result);
       });
-    };
+    });
 
-    const intervalId = setInterval(
-      () => socket.send(""),
-      60000
-    ) as unknown as number;
+    connection.start().then(() => connection.invoke("JoinGroup", params.id));
 
-    setSocket(socket);
+    setConnection(connection);
     return () => {
-      clearInterval(intervalId);
-      socket.close();
+      connection.send("LeaveGroup", params.id).then(() => connection.stop());
     };
   }, [params, user.token]);
 
   const postMessage = async (message: string): Promise<void> => {
     try {
-      if (socket) {
-        socket.send(message);
+      if (connection) {
+        connection.send("SendMessage", message);
       }
     } catch (error) {
       // todo better error handler
