@@ -14,7 +14,6 @@ import AuthProvider from "./contexts/authProvider.tsx";
 import Welcome from "./components/main/message/welcome.tsx";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-axios.defaults.headers["Access-Control-Allow-Origin"] = "*";
 
 const router = createBrowserRouter([
   {
