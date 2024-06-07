@@ -51,6 +51,7 @@ function Messages() {
         connection.send("LeaveGroup", params.id).then(() => connection.stop());
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const postMessage = async (message: string): Promise<void> => {
