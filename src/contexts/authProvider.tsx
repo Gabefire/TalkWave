@@ -44,6 +44,7 @@ function AuthProvider({ children }: { children: ReactElement }) {
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+      axios.defaults.headers["Access-Control-Allow-Origin"] = "*";
       localStorage.setItem("auth", token);
     } else {
       delete axios.defaults.headers.common["Authorization"];
