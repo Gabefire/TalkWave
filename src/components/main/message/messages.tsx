@@ -31,7 +31,7 @@ function Messages() {
       connection.onclose = () => setIsConnected(false);
       connection.on(
         "ReceiveMessage",
-        // special type for WS messages since I need to know who is owner
+        // special type for WS messages since I need to know who is owner client side
         (userId: number, message: messageWSDto) => {
           setMessage({
             author: message.author,

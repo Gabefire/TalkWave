@@ -3,11 +3,11 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import SideBar from "../../components/main/side_bar/side_bar.tsx";
 import { MemoryRouter as Router } from "react-router-dom";
-import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
 import { act } from "react-dom/test-utils";
 import { channelListContextType } from "../../contexts/channelListContext";
 import { customRender } from "../customRender";
+import { userContext } from "../testUtil";
 
 vi.mock("react-router-dom", async () => {
   const actual: [] = await vi.importActual("react-router-dom");
@@ -16,17 +16,6 @@ vi.mock("react-router-dom", async () => {
     useParams: () => vi.fn().mockReturnValue({ id: "1", type: "group" }),
   };
 });
-
-const userContext: authContextType = {
-  userName: "test",
-  setUserName: (userName: string | null) => {
-    userName;
-  },
-  token: "123",
-  setToken: (token: string | null) => {
-    token;
-  },
-};
 
 const channelListContext: channelListContextType = {
   channelDispatch: [
