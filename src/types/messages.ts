@@ -5,11 +5,10 @@ export interface messageType {
   isOwner: boolean;
 }
 
-export interface messageTypeDto {
-  Author: string;
-  Content: string;
-  CreatedAt: string;
-  IsOwner: boolean;
+export interface messageWSDto {
+  author: string;
+  content: string;
+  createdAt: string;
 }
 
 

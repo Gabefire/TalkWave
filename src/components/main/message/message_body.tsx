@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { messageType, messageTypeDto } from "../../../types/messages.ts";
+import { messageType } from "../../../types/messages.ts";
 import dateConverter from "../dateConverter.ts";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
 interface MessageBodyType {
-  message: null | messageTypeDto;
+  message: null | messageType;
 }
 
 export default function MessageBody({ message }: MessageBodyType) {
@@ -22,6 +22,7 @@ export default function MessageBody({ message }: MessageBodyType) {
         const result = (
           await axios.get<messageType[]>(`/api/Message/${params.id}`)
         ).data;
+        console.log(result);
         setMessages(result);
         setIsLoading(false);
       } catch (error) {
@@ -46,15 +47,7 @@ export default function MessageBody({ message }: MessageBodyType) {
 
   useEffect(() => {
     if (message !== null) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          isOwner: message.IsOwner,
-          author: message.Author,
-          content: message.Content,
-          createdAt: message.CreatedAt,
-        },
-      ]);
+      setMessages((prev) => [...prev, message]);
     }
   }, [message]);
 

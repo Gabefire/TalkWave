@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { messageTypeDto } from "../../../types/messages.ts";
+import { messageType, messageWSDto } from "../../../types/messages.ts";
 import MessageBody from "./message_body.tsx";
 import "./messages.css";
 import { useParams } from "react-router-dom";
@@ -14,44 +14,49 @@ function Messages() {
     null as null | signalR.HubConnection
   );
   const [isConnected, setIsConnected] = useState(false);
-  const [message, setMessage] = useState(null as null | messageTypeDto);
+  const [message, setMessage] = useState(null as null | messageType);
 
   const params = useParams();
   const user = useContext(AuthContext);
+
   useEffect(() => {
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Messages`, {
-        accessTokenFactory: () => user.token as string,
-      })
-      .build();
-
-    connection.on("open", () => {
-      setTimeout(() => setIsConnected(true), 1000);
-    });
-
-    connection.onclose = () => {
-      setIsConnected(false);
+    const createHubConnection = () => {
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
+          accessTokenFactory: () => user.token as string,
+        })
+        .withAutomaticReconnect()
+        .build();
+      setIsConnected(true);
+      connection.onclose = () => setIsConnected(false);
+      connection.on(
+        "ReceiveMessage",
+        // special type for WS messages since I need to know who is owner
+        (userId: number, message: messageWSDto) => {
+          setMessage({
+            author: message.author,
+            content: message.content,
+            createdAt: message.createdAt,
+            isOwner: userId.toString() === user.userId,
+          });
+        }
+      );
+      return connection;
     };
-
-    connection.on("ReceiveMessage,", (message) => {
-      (message.data as Blob).text().then((resultString) => {
-        const result: messageTypeDto = JSON.parse(resultString);
-        setMessage(result);
-      });
-    });
-
-    connection.start().then(() => connection.invoke("JoinGroup", params.id));
-
+    const connection = createHubConnection();
     setConnection(connection);
+    connection.start().then(() => connection.invoke("JoinGroup", params.id));
     return () => {
-      connection.send("LeaveGroup", params.id).then(() => connection.stop());
+      if (connection) {
+        connection.send("LeaveGroup", params.id).then(() => connection.stop());
+      }
     };
-  }, [params, user.token]);
+  }, [params.id]);
 
   const postMessage = async (message: string): Promise<void> => {
     try {
       if (connection) {
-        connection.send("SendMessage", message);
+        connection.send("SendMessage", params.id, message);
       }
     } catch (error) {
       // todo better error handler

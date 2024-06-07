@@ -13,6 +13,7 @@ export type loginUserType = {
 export type loginUserDtoType = {
   userName: string;
   token: string;
+  id: string;
 }
 
 export type user = {
@@ -38,6 +39,8 @@ export type authContextType = {
   userName: string | null,
   setUserName: (userName: string| null) => void
   token: string | null,
-  setToken: (token: string | null) => void 
+  setToken: (token: string | null) => void,
+  userId: string | null,
+  setUserId: (userId: string | null) => void
 }
 
