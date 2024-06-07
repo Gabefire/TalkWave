@@ -22,7 +22,6 @@ export default function MessageBody({ message }: MessageBodyType) {
         const result = (
           await axios.get<messageType[]>(`/api/Message/${params.id}`)
         ).data;
-        console.log(result);
         setMessages(result);
         setIsLoading(false);
       } catch (error) {
