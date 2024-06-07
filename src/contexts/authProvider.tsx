@@ -18,11 +18,16 @@ export const AuthContext: React.Context<authContextType> = createContext({
   setToken: (token: string | null): void => {
     token;
   },
+  userId: null as string | null,
+  setUserId: (userId: string | null): void => {
+    userId;
+  },
 });
 
 function AuthProvider({ children }: { children: ReactElement }) {
   const [token, setToken_] = useState(localStorage.getItem("auth"));
   const [userName, setUserName_] = useState(localStorage.getItem("userName"));
+  const [userId, setUserId_] = useState(localStorage.getItem("userId"));
 
   const setToken = (newToken: string | null) => {
     setToken_(newToken);
@@ -30,6 +35,10 @@ function AuthProvider({ children }: { children: ReactElement }) {
 
   const setUserName = (userName: string | null) => {
     setUserName_(userName);
+  };
+
+  const setUserId = (userId: string | null) => {
+    setUserId_(userId);
   };
 
   useEffect(() => {
@@ -50,14 +59,24 @@ function AuthProvider({ children }: { children: ReactElement }) {
     }
   }, [userName]);
 
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem("userId", userId);
+    } else {
+      localStorage.removeItem("userId");
+    }
+  });
+
   const contextValue = useMemo(
     () => ({
       userName,
       setUserName,
       token,
       setToken,
+      userId,
+      setUserId,
     }),
-    [token, userName]
+    [token, userName, userId]
   );
 
   return (

@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 
 export const useProvideAuth = () => {
-  const { setToken, setUserName } = useContext(AuthContext);
+  const { setToken, setUserName, setUserId } = useContext(AuthContext);
 
   const login = async (
     loginUser: loginUserType
@@ -21,6 +21,7 @@ export const useProvideAuth = () => {
       ).data;
       setToken(userDto.token);
       setUserName(userDto.userName);
+      setUserId(userDto.id);
       axios.defaults.headers.common["Authorization"] =
         "Bearer " + userDto.token;
     } catch (err) {
