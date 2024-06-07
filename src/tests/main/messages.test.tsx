@@ -1,7 +1,6 @@
 import { screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
 import { act } from "react-dom/test-utils";
 import MessageHeader from "../../components/main/message/message_header";
@@ -9,17 +8,8 @@ import MessageBody from "../../components/main/message/message_body";
 import MessageSend from "../../components/main/message/message_send";
 import { customRender } from "../customRender";
 import { channelListContextType } from "../../contexts/channelListContext";
-
-const userContext: authContextType = {
-  userName: "test",
-  setUserName: (userName: string | null) => {
-    userName;
-  },
-  token: "123",
-  setToken: (token: string | null) => {
-    token;
-  },
-};
+import { userContext } from "../testUtil";
+import { messageType } from "../../types/messages";
 
 const channelListContext: channelListContextType = {
   channelDispatch: [
@@ -104,11 +94,11 @@ describe("Message Body", () => {
   });
   test("Message that was added is shown", async () => {
     await act(async () => {
-      const message = {
-        Author: "leah",
-        Content: "Hi this is Leah",
-        CreatedAt: new Date().toString(),
-        IsOwner: false,
+      const message: messageType = {
+        author: "leah",
+        content: "Hi this is Leah",
+        createdAt: new Date().toString(),
+        isOwner: false,
       };
       customRender(
         <MessageBody message={message} />,

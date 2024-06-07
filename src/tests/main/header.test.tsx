@@ -3,21 +3,10 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import Header from "../../components/main/header/header";
 import { BrowserRouter } from "react-router-dom";
-import { authContextType } from "../../types/auth";
 import { vi } from "vitest";
 import { channelListContextType } from "../../contexts/channelListContext";
 import { customRender } from "../customRender";
-
-const userContext: authContextType = {
-  userName: "test",
-  setUserName: (userName: string | null) => {
-    userName;
-  },
-  token: "123",
-  setToken: (token: string | null) => {
-    token;
-  },
-};
+import { userContext } from "../testUtil";
 
 const channelListContext: channelListContextType = {
   channelDispatch: [

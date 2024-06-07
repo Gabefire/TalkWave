@@ -59,7 +59,8 @@ const channel: channelType = {
 
 const userDto: loginUserDtoType = {
     userName: "test",
-    token: "1"
+    token: "1",
+    id: "1"
 }
 
 const groupSearchResults: channelType[] =[
