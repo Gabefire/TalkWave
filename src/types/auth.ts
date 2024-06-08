@@ -44,3 +44,7 @@ export type authContextType = {
   setUserId: (userId: string | null) => void
 }
 
+export type authUtilContextType = {
+  setLoadingLogin?: (loading: boolean) => void,
+}
+

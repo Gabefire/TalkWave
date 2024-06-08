@@ -6,6 +6,12 @@
     height: 100%;
 }
 
+.load-login {
+    align-self: center;
+    position: absolute;
+    top: 30%;
+}
+
 .auth-form {
     display: flex;
     flex-direction: column;

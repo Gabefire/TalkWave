@@ -1,16 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { useProvideAuth } from "../../hooks/useProvideAuth";
+import { useContext } from "react";
+import { AuthUtilContext } from "./auth_root";
 
 export default function MainPage() {
   const { login } = useProvideAuth();
   const navigate = useNavigate();
+  const { setLoadingLogin } = useContext(AuthUtilContext);
 
   const loginTryMe = async () => {
     try {
+      if (setLoadingLogin) setLoadingLogin(true);
       await login({ email: "test@test.com", password: "1234" });
       navigate("/main");
     } catch (err) {
       console.error(err);
+    } finally {
+      if (setLoadingLogin) setLoadingLogin(false);
     }
   };
 

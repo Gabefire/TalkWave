@@ -4,6 +4,8 @@ import { z } from "zod";
 import { loginErrorType, signUpErrorType } from "../../types/auth";
 import useProvideAuth from "../../hooks/useProvideAuth";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthUtilContext } from "./auth_root";
 
 const signUpFormSchema = z
   .object({
@@ -35,6 +37,7 @@ const EditProfile = () => {
 
   const navigate = useNavigate();
   const { editProfile } = useProvideAuth();
+  const { setLoadingLogin } = useContext(AuthUtilContext);
 
   const validateResults = (results: signUpErrorType[] | loginErrorType[]) => {
     results.forEach((obj) => {
@@ -60,11 +63,18 @@ const EditProfile = () => {
   };
 
   const onSubmit: SubmitHandler<signUpFormSchemaType> = async (user) => {
-    const signUpResults = await editProfile(user);
-    if (signUpResults instanceof Array && signUpResults.length > 0) {
-      validateResults(signUpResults);
+    try {
+      if (setLoadingLogin) setLoadingLogin(true);
+      const signUpResults = await editProfile(user);
+      if (signUpResults instanceof Array && signUpResults.length > 0) {
+        validateResults(signUpResults);
+      }
+      navigate(-1);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (setLoadingLogin) setLoadingLogin(false);
     }
-    navigate(-1);
   };
 
   return (

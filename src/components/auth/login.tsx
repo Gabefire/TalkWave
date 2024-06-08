@@ -3,6 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useProvideAuth from "../../hooks/useProvideAuth";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthUtilContext } from "./auth_root";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, "Email is required").max(100),
@@ -21,23 +23,35 @@ function Login() {
 
   const { login } = useProvideAuth();
   const navigate = useNavigate();
+  const { setLoadingLogin } = useContext(AuthUtilContext);
 
   const onSubmit: SubmitHandler<loginFormSchemaType> = async (user) => {
-    const results = await login(user);
-    if (results instanceof Array) {
-      results.forEach((obj) => {
-        const key = Object.keys(obj)[0];
-        const value = Object.values(obj)[0];
-        if (key === "email") {
-          setError("email", { type: "manual", message: `${value}` });
-        } else if (key === "password") {
-          setError("password", { type: "manual", message: `${value}` });
-        } else if (key === "root") {
-          setError("root.serverError", { type: "404", message: `${value}` });
-        }
-      });
-    } else {
-      navigate("/main");
+    try {
+      if (setLoadingLogin) {
+        setLoadingLogin(true);
+      }
+      const results = await login(user);
+      if (results instanceof Array) {
+        results.forEach((obj) => {
+          const key = Object.keys(obj)[0];
+          const value = Object.values(obj)[0];
+          if (key === "email") {
+            setError("email", { type: "manual", message: `${value}` });
+          } else if (key === "password") {
+            setError("password", { type: "manual", message: `${value}` });
+          } else if (key === "root") {
+            setError("root.serverError", { type: "404", message: `${value}` });
+          }
+        });
+      } else {
+        navigate("/main");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (setLoadingLogin) {
+        setLoadingLogin(false);
+      }
     }
   };
   return (
