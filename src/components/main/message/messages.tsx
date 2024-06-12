@@ -27,7 +27,6 @@ function Messages() {
         })
         .withAutomaticReconnect()
         .build();
-      setIsConnected(true);
       connection.onclose = () => setIsConnected(false);
       connection.on(
         "ReceiveMessage",
@@ -45,14 +44,18 @@ function Messages() {
     };
     const connection = createHubConnection();
     setConnection(connection);
-    connection.start().then(() => connection.invoke("JoinGroup", params.id));
+
+    connection
+      .start()
+      .then(() => connection.invoke("JoinGroup", params.id))
+      .then(() => setIsConnected(true));
     return () => {
       if (connection) {
         connection.stop();
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id]);
+  }, []);
 
   const postMessage = async (message: string): Promise<void> => {
     try {
