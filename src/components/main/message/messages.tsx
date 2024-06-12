@@ -48,7 +48,7 @@ function Messages() {
     connection.start().then(() => connection.invoke("JoinGroup", params.id));
     return () => {
       if (connection) {
-        connection.send("LeaveGroup", params.id).then(() => connection.stop());
+        connection.stop();
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
