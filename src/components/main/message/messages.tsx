@@ -20,7 +20,7 @@ function Messages() {
   const user = useContext(AuthContext);
 
   useEffect(() => {
-    const createHubConnection = () => {
+    const createHubConnection = async () => {
       const connection = new signalR.HubConnectionBuilder()
         .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
           accessTokenFactory: () => user.token as string,
@@ -40,15 +40,15 @@ function Messages() {
           });
         }
       );
-      return connection;
+      await connection
+        .start()
+        .then(() => connection.invoke("JoinGroup", params.id))
+        .then(() => {
+          setIsConnected(true);
+          setConnection(connection);
+        });
     };
-    const connection = createHubConnection();
-    setConnection(connection);
-
-    connection
-      .start()
-      .then(() => connection.invoke("JoinGroup", params.id))
-      .then(() => setIsConnected(true));
+    createHubConnection();
     return () => {
       if (connection) {
         connection.stop();
