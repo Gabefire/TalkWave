@@ -25,6 +25,7 @@ function Messages() {
         .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
           accessTokenFactory: () => user.token as string,
         })
+        .configureLogging(signalR.LogLevel.Debug)
         .withAutomaticReconnect()
         .build();
       connection.onclose = () => setIsConnected(false);
