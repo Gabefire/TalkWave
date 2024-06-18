@@ -41,6 +41,7 @@ function Messages() {
           });
         }
       );
+      console.log("fired");
       await connection
         .start()
         .then(() => connection.invoke("JoinGroup", params.id))
