@@ -51,8 +51,7 @@ function Messages() {
         });
     };
     createHubConnection();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params, user.token, user.userId]);
 
   const postMessage = async (message: string): Promise<void> => {
     try {
