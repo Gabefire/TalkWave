@@ -20,41 +20,45 @@ function Messages() {
   const user = useContext(AuthContext);
 
   useEffect(() => {
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
+        accessTokenFactory: () => user.token as string,
+      })
+      .configureLogging(signalR.LogLevel.Debug)
+      .withAutomaticReconnect()
+      .build();
+    setConnection(connection);
+
     const createHubConnection = async () => {
-      const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
-          accessTokenFactory: () => user.token as string,
-        })
-        .configureLogging(signalR.LogLevel.Debug)
-        .withAutomaticReconnect()
-        .build();
-      connection.onclose = () => setIsConnected(false);
-      connection.on(
-        "ReceiveMessage",
-        // special type for WS messages since I need to know who is owner client side
-        (userId: number, message: messageWSDto) => {
-          setMessage({
-            author: message.author,
-            content: message.content,
-            createdAt: message.createdAt,
-            isOwner: userId.toString() === user.userId,
-          });
-        }
-      );
-      console.log("fired");
-      setConnection(connection);
-      await connection
-        .start()
-        .then(() => connection.invoke("JoinGroup", params.id))
-        .then(() => {
-          setIsConnected(true);
-        })
-        .catch((e) => console.log(e));
+      try {
+        await connection.start();
+        setIsConnected(true);
+        await connection.invoke("JoinGroup", params.id);
+        connection.on(
+          "ReceiveMessage",
+          // special type for WS messages since I need to know who is owner client side
+          (userId: number, message: messageWSDto) => {
+            setMessage({
+              author: message.author,
+              content: message.content,
+              createdAt: message.createdAt,
+              isOwner: userId.toString() === user.userId,
+            });
+          }
+        );
+        connection.onclose(() => setIsConnected(false));
+        connection.onreconnected(() =>
+          connection.invoke("JoinGroup", params.id)
+        );
+      } catch (error) {
+        console.log(error);
+      }
     };
+
     createHubConnection();
     return () => {
       if (connection) {
-        connection.stop();
+        connection.send("LeaveGroup", params.id).then(() => connection.stop());
       }
     };
   }, [params, user.token, user.userId]);
