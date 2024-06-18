@@ -50,11 +50,6 @@ function Messages() {
         });
     };
     createHubConnection();
-    return () => {
-      if (connection) {
-        connection.stop();
-      }
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
