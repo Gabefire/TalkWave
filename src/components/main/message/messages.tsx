@@ -48,7 +48,8 @@ function Messages() {
         .then(() => connection.invoke("JoinGroup", params.id))
         .then(() => {
           setIsConnected(true);
-        });
+        })
+        .catch((e) => console.log(e));
     };
     createHubConnection();
     return () => {
