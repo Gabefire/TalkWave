@@ -23,7 +23,8 @@ function Messages() {
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
         accessTokenFactory: () => user.token as string,
-        transport: signalR.HttpTransportType.LongPolling,
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
       })
       .configureLogging(signalR.LogLevel.Debug)
       .withAutomaticReconnect()
