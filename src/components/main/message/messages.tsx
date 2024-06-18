@@ -42,15 +42,20 @@ function Messages() {
         }
       );
       console.log("fired");
+      setConnection(connection);
       await connection
         .start()
         .then(() => connection.invoke("JoinGroup", params.id))
         .then(() => {
           setIsConnected(true);
-          setConnection(connection);
         });
     };
     createHubConnection();
+    return () => {
+      if (connection) {
+        connection.stop();
+      }
+    };
   }, [params, user.token, user.userId]);
 
   const postMessage = async (message: string): Promise<void> => {
