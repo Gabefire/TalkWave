@@ -35,6 +35,8 @@ function Messages() {
     const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
         accessTokenFactory: () => userToken,
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
       })
       .configureLogging(signalR.LogLevel.Debug)
       .build();
