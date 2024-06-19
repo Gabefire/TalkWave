@@ -79,7 +79,7 @@ function Header() {
       setDisplaySearchBox(false);
       return;
     }
-    const timeoutId = setTimeout(getSearchResults, 1000);
+    const timeoutId = setTimeout(getSearchResults, 200);
     return () => {
       clearTimeout(timeoutId);
       setLoadingSearchResults(true);

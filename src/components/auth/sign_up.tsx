@@ -165,7 +165,7 @@ const SignUp = () => {
         className="form-button sign-up"
         onClick={(e) => {
           e.preventDefault();
-          navigate(-1);
+          navigate("/");
         }}
       >
         Back
