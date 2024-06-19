@@ -29,21 +29,22 @@ function Messages() {
 
   const [connectionRef, setConnection] = useState<signalR.HubConnection>();
 
-  function createHubConnection(userToken: string) {
-    const hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
-        accessTokenFactory: () => userToken,
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
-      })
-      .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Debug)
-      .build();
-    setConnection(hubConnection);
-  }
-
   useEffect(() => {
-    if (user.token) createHubConnection(user.token);
+    if (user.token) {
+      const hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
+          accessTokenFactory: () => user.token as string,
+          skipNegotiation: true,
+          transport: signalR.HttpTransportType.WebSockets,
+        })
+        .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.Debug)
+        .build();
+      setConnection(hubConnection);
+    }
+    return () => {
+      if (connectionRef) connectionRef.stop();
+    };
   }, [user]);
 
   useEffect(() => {
@@ -60,13 +61,11 @@ function Messages() {
             "ReceiveMessage",
             // special type for WS messages since I need to know who is owner client side
             (userId: number, message: messageWSDto) => {
-              console.log(userId);
-              console.log(user.userId);
               setMessage({
                 author: message.author,
                 content: message.content,
                 createdAt: message.createdAt,
-                isOwner: userId.toString() === user.userId,
+                isOwner: userId.toString() === user.userId?.toString(),
               });
             }
           );

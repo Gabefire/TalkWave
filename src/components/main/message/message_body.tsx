@@ -46,6 +46,7 @@ export default function MessageBody({ message }: MessageBodyType) {
 
   useEffect(() => {
     if (message !== null) {
+      console.log(message);
       setMessages((prev) => [...prev, message]);
     }
   }, [message]);
