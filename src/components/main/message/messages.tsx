@@ -66,11 +66,11 @@ function Messages() {
 
         connectionRef.onclose(() => {
           setIsConnected(false);
-          if (connectionRef) connectionRef.send("LeaveGroup", params.id);
         });
         connectionRef.onreconnected(() => {
           if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
         });
+
         connectionRef.invoke("JoinGroup", params.id);
       });
     }
