@@ -16,8 +16,6 @@ function Messages() {
   const params = useParams();
   const user = useContext(AuthContext);
 
-  const url = window.location.pathname.split("/").pop();
-
   const postMessage = async (message: string): Promise<void> => {
     try {
       if (connectionRef) {
@@ -45,7 +43,7 @@ function Messages() {
 
   useEffect(() => {
     if (user.token) createHubConnection(user.token);
-  }, [url, user]);
+  }, [user]);
 
   useEffect(() => {
     if (connectionRef) {
@@ -76,9 +74,12 @@ function Messages() {
     }
 
     return () => {
-      if (connectionRef) connectionRef.stop();
+      if (connectionRef) {
+        setIsConnected(false);
+        connectionRef.invoke("LeaveGroup", params.id);
+      }
     };
-  }, [connectionRef]);
+  }, [connectionRef, params.id]);
 
   return (
     <div className="message-body">
