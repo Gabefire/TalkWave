@@ -20,38 +20,46 @@ function Messages() {
   const user = useContext(AuthContext);
 
   useEffect(() => {
-    const connection = new signalR.HubConnectionBuilder()
+    if (connection) {
+      connection.stop();
+    }
+    const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
         accessTokenFactory: () => user.token as string,
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
       })
       .configureLogging(signalR.LogLevel.Debug)
       .withAutomaticReconnect()
       .build();
-    setConnection(connection);
+    setConnection(hubConnection);
 
     const createHubConnection = async () => {
       try {
-        await connection.start();
-        setIsConnected(true);
-        await connection.invoke("JoinGroup", params.id);
-        connection.on(
-          "ReceiveMessage",
-          // special type for WS messages since I need to know who is owner client side
-          (userId: number, message: messageWSDto) => {
-            setMessage({
-              author: message.author,
-              content: message.content,
-              createdAt: message.createdAt,
-              isOwner: userId.toString() === user.userId,
-            });
-          }
-        );
-        connection.onclose(() => setIsConnected(false));
-        connection.onreconnected(() =>
-          connection.invoke("JoinGroup", params.id)
-        );
+        if (connection) {
+          await connection.start();
+          setIsConnected(true);
+          await connection.invoke("JoinGroup", params.id);
+          connection.on(
+            "ReceiveMessage",
+            // special type for WS messages since I need to know who is owner client side
+            (userId: number, message: messageWSDto) => {
+              setMessage({
+                author: message.author,
+                content: message.content,
+                createdAt: message.createdAt,
+                isOwner: userId.toString() === user.userId,
+              });
+            }
+          );
+          connection.onclose(() => {
+            setIsConnected(false);
+            connection.send("LeaveGroup", params.id);
+          });
+          connection.onreconnected(() =>
+            connection.invoke("JoinGroup", params.id)
+          );
+        } else {
+          throw new Error("No connection");
+        }
       } catch (error) {
         console.log(error);
       }
@@ -60,7 +68,7 @@ function Messages() {
     createHubConnection();
     return () => {
       if (connection) {
-        connection.send("LeaveGroup", params.id).then(() => connection.stop());
+        connection.stop();
       }
     };
   }, [params, user.token, user.userId]);
