@@ -10,34 +10,51 @@ import MessageSend from "./message_send.tsx";
 import * as signalR from "@microsoft/signalr";
 
 function Messages() {
-  const [connection, setConnection] = useState(
-    null as null | signalR.HubConnection
-  );
   const [isConnected, setIsConnected] = useState(false);
   const [message, setMessage] = useState(null as null | messageType);
 
   const params = useParams();
   const user = useContext(AuthContext);
 
-  useEffect(() => {
-    if (connection) {
-      connection.stop();
+  const postMessage = async (message: string): Promise<void> => {
+    try {
+      if (connectionRef) {
+        connectionRef.send("SendMessage", params.id, message);
+      }
+    } catch (error) {
+      // todo better error handler
+      console.error(error);
     }
+  };
+
+  const [connectionRef, setConnection] = useState<signalR.HubConnection>();
+
+  function createHubConnection(userToken: string) {
     const hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
-        accessTokenFactory: () => user.token as string,
+        accessTokenFactory: () => userToken,
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
       })
-      .configureLogging(signalR.LogLevel.Debug)
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Debug)
       .build();
     setConnection(hubConnection);
+  }
 
-    const createHubConnection = async () => {
-      try {
-        await hubConnection.start();
+  useEffect(() => {
+    if (user.token) createHubConnection(user.token);
+  }, [user]);
+
+  useEffect(() => {
+    const startConnection = async () => {
+      if (connectionRef) {
+        if (connectionRef.state !== signalR.HubConnectionState.Connected) {
+          await connectionRef.start();
+        }
+
         setIsConnected(true);
-        await hubConnection.invoke("JoinGroup", params.id);
-        hubConnection.on(
+        connectionRef.on(
           "ReceiveMessage",
           // special type for WS messages since I need to know who is owner client side
           (userId: number, message: messageWSDto) => {
@@ -49,36 +66,25 @@ function Messages() {
             });
           }
         );
-        hubConnection.onclose(() => {
+
+        connectionRef.onclose(() => {
           setIsConnected(false);
-          if (connection) connection.send("LeaveGroup", params.id);
         });
-        hubConnection.onreconnected(() => {
-          if (connection) connection.invoke("JoinGroup", params.id);
+        connectionRef.onreconnected(() => {
+          if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
         });
-      } catch (error) {
-        console.log(error);
+
+        await connectionRef.invoke("JoinGroup", params.id);
       }
     };
-
-    createHubConnection();
+    startConnection();
     return () => {
-      if (connection) {
-        connection.stop();
+      if (connectionRef) {
+        setIsConnected(false);
+        connectionRef.invoke("LeaveGroup", params.id);
       }
     };
-  }, [params, user.token, user.userId]);
-
-  const postMessage = async (message: string): Promise<void> => {
-    try {
-      if (connection) {
-        connection.send("SendMessage", params.id, message);
-      }
-    } catch (error) {
-      // todo better error handler
-      console.error(error);
-    }
-  };
+  }, [connectionRef, params.id]);
 
   return (
     <div className="message-body">
