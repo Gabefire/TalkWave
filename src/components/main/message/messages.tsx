@@ -28,7 +28,6 @@ function Messages() {
         accessTokenFactory: () => user.token as string,
       })
       .configureLogging(signalR.LogLevel.Debug)
-      .withAutomaticReconnect()
       .build();
     setConnection(hubConnection);
 
@@ -64,6 +63,7 @@ function Messages() {
     createHubConnection();
     return () => {
       if (connection) {
+        console.log("stop");
         connection.stop();
       }
     };
