@@ -38,7 +38,6 @@ function Messages() {
           transport: signalR.HttpTransportType.WebSockets,
         })
         .withAutomaticReconnect()
-        .configureLogging(signalR.LogLevel.Debug)
         .build();
       setConnection(hubConnection);
     }
