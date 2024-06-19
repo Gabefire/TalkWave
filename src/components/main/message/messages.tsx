@@ -36,6 +36,7 @@ function Messages() {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
       })
+      .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Debug)
       .build();
     setConnection(hubConnection);
@@ -46,8 +47,12 @@ function Messages() {
   }, [user]);
 
   useEffect(() => {
-    if (connectionRef) {
-      connectionRef.start().then(() => {
+    const startConnection = async () => {
+      if (connectionRef) {
+        if (connectionRef.state !== signalR.HubConnectionState.Connected) {
+          await connectionRef.start();
+        }
+
         setIsConnected(true);
         connectionRef.on(
           "ReceiveMessage",
@@ -69,10 +74,10 @@ function Messages() {
           if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
         });
 
-        connectionRef.invoke("JoinGroup", params.id);
-      });
-    }
-
+        await connectionRef.invoke("JoinGroup", params.id);
+      }
+    };
+    startConnection();
     return () => {
       if (connectionRef) {
         setIsConnected(false);
