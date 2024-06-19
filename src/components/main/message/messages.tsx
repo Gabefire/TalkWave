@@ -34,32 +34,28 @@ function Messages() {
 
     const createHubConnection = async () => {
       try {
-        if (connection) {
-          await connection.start();
-          setIsConnected(true);
-          await connection.invoke("JoinGroup", params.id);
-          connection.on(
-            "ReceiveMessage",
-            // special type for WS messages since I need to know who is owner client side
-            (userId: number, message: messageWSDto) => {
-              setMessage({
-                author: message.author,
-                content: message.content,
-                createdAt: message.createdAt,
-                isOwner: userId.toString() === user.userId,
-              });
-            }
-          );
-          connection.onclose(() => {
-            setIsConnected(false);
-            connection.send("LeaveGroup", params.id);
-          });
-          connection.onreconnected(() =>
-            connection.invoke("JoinGroup", params.id)
-          );
-        } else {
-          throw new Error("No connection");
-        }
+        await hubConnection.start();
+        setIsConnected(true);
+        await hubConnection.invoke("JoinGroup", params.id);
+        hubConnection.on(
+          "ReceiveMessage",
+          // special type for WS messages since I need to know who is owner client side
+          (userId: number, message: messageWSDto) => {
+            setMessage({
+              author: message.author,
+              content: message.content,
+              createdAt: message.createdAt,
+              isOwner: userId.toString() === user.userId,
+            });
+          }
+        );
+        hubConnection.onclose(() => {
+          setIsConnected(false);
+          if (connection) connection.send("LeaveGroup", params.id);
+        });
+        hubConnection.onreconnected(() => {
+          if (connection) connection.invoke("JoinGroup", params.id);
+        });
       } catch (error) {
         console.log(error);
       }
