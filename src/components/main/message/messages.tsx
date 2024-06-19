@@ -49,32 +49,39 @@ function Messages() {
   useEffect(() => {
     const startConnection = async () => {
       if (connectionRef) {
-        if (connectionRef.state !== signalR.HubConnectionState.Connected) {
-          await connectionRef.start();
-        }
-
-        setIsConnected(true);
-        connectionRef.on(
-          "ReceiveMessage",
-          // special type for WS messages since I need to know who is owner client side
-          (userId: number, message: messageWSDto) => {
-            setMessage({
-              author: message.author,
-              content: message.content,
-              createdAt: message.createdAt,
-              isOwner: userId.toString() === user.userId,
-            });
+        try {
+          if (connectionRef.state !== signalR.HubConnectionState.Connected) {
+            await connectionRef.start();
           }
-        );
 
-        connectionRef.onclose(() => {
-          setIsConnected(false);
-        });
-        connectionRef.onreconnected(() => {
-          if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
-        });
+          setIsConnected(true);
+          connectionRef.off("ReceiveMessage");
+          connectionRef.on(
+            "ReceiveMessage",
+            // special type for WS messages since I need to know who is owner client side
+            (userId: number, message: messageWSDto) => {
+              console.log(userId);
+              console.log(user.userId);
+              setMessage({
+                author: message.author,
+                content: message.content,
+                createdAt: message.createdAt,
+                isOwner: userId.toString() === user.userId,
+              });
+            }
+          );
 
-        await connectionRef.invoke("JoinGroup", params.id);
+          connectionRef.onclose(() => {
+            setIsConnected(false);
+          });
+          connectionRef.onreconnected(() => {
+            if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
+          });
+
+          await connectionRef.invoke("JoinGroup", params.id);
+        } catch (error) {
+          console.error(error);
+        }
       }
     };
     startConnection();
@@ -84,7 +91,7 @@ function Messages() {
         connectionRef.invoke("LeaveGroup", params.id);
       }
     };
-  }, [connectionRef, params.id]);
+  }, [connectionRef, params.id, user.userId]);
 
   return (
     <div className="message-body">
