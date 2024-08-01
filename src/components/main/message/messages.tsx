@@ -29,52 +29,57 @@ function Messages() {
 
   const [connectionRef, setConnection] = useState<signalR.HubConnection>();
 
-  function createHubConnection(userToken: string) {
-    const hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
-        accessTokenFactory: () => userToken,
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
-      })
-      .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Debug)
-      .build();
-    setConnection(hubConnection);
-  }
-
   useEffect(() => {
-    if (user.token) createHubConnection(user.token);
-  }, [user]);
+    if (user.token) {
+      const hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
+          accessTokenFactory: () => user.token as string,
+          skipNegotiation: true,
+          transport: signalR.HttpTransportType.WebSockets,
+        })
+        .build();
+      setConnection(hubConnection);
+    }
+    return () => {
+      if (connectionRef) connectionRef.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const startConnection = async () => {
       if (connectionRef) {
-        if (connectionRef.state !== signalR.HubConnectionState.Connected) {
-          await connectionRef.start();
-        }
-
-        setIsConnected(true);
-        connectionRef.on(
-          "ReceiveMessage",
-          // special type for WS messages since I need to know who is owner client side
-          (userId: number, message: messageWSDto) => {
-            setMessage({
-              author: message.author,
-              content: message.content,
-              createdAt: message.createdAt,
-              isOwner: userId.toString() === user.userId,
-            });
+        try {
+          if (connectionRef.state !== signalR.HubConnectionState.Connected) {
+            await connectionRef.start();
           }
-        );
 
-        connectionRef.onclose(() => {
-          setIsConnected(false);
-        });
-        connectionRef.onreconnected(() => {
-          if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
-        });
+          setIsConnected(true);
+          connectionRef.off("ReceiveMessage");
+          connectionRef.on(
+            "ReceiveMessage",
+            // special type for WS messages since I need to know who is owner client side
+            (userId: number, message: messageWSDto) => {
+              setMessage({
+                author: message.author,
+                content: message.content,
+                createdAt: message.createdAt,
+                isOwner: userId.toString() === user.userId?.toString(),
+              });
+            }
+          );
 
-        await connectionRef.invoke("JoinGroup", params.id);
+          connectionRef.onclose(() => {
+            setIsConnected(false);
+          });
+          connectionRef.onreconnected(() => {
+            if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
+          });
+
+          await connectionRef.invoke("JoinGroup", params.id);
+        } catch (error) {
+          console.error(error);
+        }
       }
     };
     startConnection();
@@ -84,7 +89,7 @@ function Messages() {
         connectionRef.invoke("LeaveGroup", params.id);
       }
     };
-  }, [connectionRef, params.id]);
+  }, [connectionRef, params.id, user.userId]);
 
   return (
     <div className="message-body">
