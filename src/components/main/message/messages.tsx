@@ -37,7 +37,6 @@ function Messages() {
           skipNegotiation: true,
           transport: signalR.HttpTransportType.WebSockets,
         })
-        .withAutomaticReconnect()
         .build();
       setConnection(hubConnection);
     }
