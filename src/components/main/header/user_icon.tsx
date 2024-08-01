@@ -26,6 +26,7 @@ function UserIcon({ user }: userIconType) {
           channels: [
             {
               ...response.data,
+              type: "user",
               name: user.userName,
             },
           ],
