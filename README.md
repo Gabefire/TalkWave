@@ -13,19 +13,13 @@
 AWS infrastructure:
 ![image](https://github.com/user-attachments/assets/e07276f5-cc96-4863-b97a-05b48f63b42a)
 
-## Technologies
-- Typescript
-- React
-- CSS
-- Zod
-- Websockets
-
 ## Features
 - Create an account
 - Chat with friends
 - Chat with user groups
 - User profile
 - Channel management
+- Live chat implemented using [SignalR](https://dotnet.microsoft.com/en-us/apps/aspnet/signalr)
 
 
 ## Usage
