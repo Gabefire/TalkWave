@@ -5,6 +5,10 @@
 
 - [Backend C#](https://github.com/Gabefire/TalkWaveApi)
 
+>[!IMPORTANT]
+> A majority of the server architecture is serverless, so there might be a start-up cost
+> on the first load. 
+
 ## Dev Features
 - App is fully deployed on AWS using S3 and Cloudfront
 - Fully test driven
