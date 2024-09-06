@@ -45,7 +45,8 @@ function Messages() {
 		const startConnection = async () => {
 			if (connectionRef) {
 				try {
-					if (connectionRef.state !== signalR.HubConnectionState.Connected) {
+					console.log(connectionRef.state);
+					if (connectionRef.state === signalR.HubConnectionState.Disconnected) {
 						await connectionRef.start();
 						setIsConnected(true);
 						connectionRef.on(
@@ -68,8 +69,8 @@ function Messages() {
 							if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
 						});
 					}
-
-					await connectionRef.invoke("JoinGroup", params.id);
+					if (connectionRef.state !== signalR.HubConnectionState.Disconnected)
+						await connectionRef.invoke("JoinGroup", params.id);
 				} catch (error) {
 					console.error(error);
 				}
