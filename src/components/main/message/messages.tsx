@@ -78,12 +78,6 @@ function Messages() {
 			}
 		};
 		startConnection();
-		return () => {
-			console.log("test");
-			if (connectionRef !== undefined) {
-				connectionRef.invoke("LeaveGroup", params.id);
-			}
-		};
 	}, [params, connectionRef, user.userId]);
 
 	return (
