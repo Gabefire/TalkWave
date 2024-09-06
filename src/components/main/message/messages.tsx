@@ -53,6 +53,7 @@ function Messages() {
 					}
 
 					await connectionRef.start();
+					console.log("connected");
 					setIsConnected(true);
 					connectionRef.on(
 						"ReceiveMessage",
