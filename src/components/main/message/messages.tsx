@@ -10,106 +10,102 @@ import MessageSend from "./message_send.tsx";
 import * as signalR from "@microsoft/signalr";
 
 function Messages() {
-  const [isConnected, setIsConnected] = useState(false);
-  const [message, setMessage] = useState(null as null | messageType);
+	const [isConnected, setIsConnected] = useState(false);
+	const [message, setMessage] = useState(null as null | messageType);
 
-  const params = useParams();
-  const user = useContext(AuthContext);
+	const params = useParams();
+	const user = useContext(AuthContext);
 
-  const postMessage = async (message: string): Promise<void> => {
-    try {
-      if (connectionRef) {
-        connectionRef.send("SendMessage", params.id, message);
-      }
-    } catch (error) {
-      // todo better error handler
-      console.error(error);
-    }
-  };
+	const postMessage = async (message: string): Promise<void> => {
+		try {
+			if (connectionRef) {
+				connectionRef.send("SendMessage", params.id, message);
+			}
+		} catch (error) {
+			// todo better error handler
+			console.error(error);
+		}
+	};
 
-  const [connectionRef, setConnection] = useState<signalR.HubConnection>();
+	const [connectionRef, setConnection] = useState<signalR.HubConnection>();
 
-  useEffect(() => {
-    if (user.token) {
-      const hubConnection = new signalR.HubConnectionBuilder()
-        .withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
-          accessTokenFactory: () => user.token as string,
-          skipNegotiation: true,
-          transport: signalR.HttpTransportType.WebSockets,
-        })
-        .build();
-      setConnection(hubConnection);
-    }
-    return () => {
-      if (connectionRef) connectionRef.stop();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+	useEffect(() => {
+		if (user.token) {
+			const hubConnection = new signalR.HubConnectionBuilder()
+				.withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
+					accessTokenFactory: () => user.token as string,
+					skipNegotiation: true,
+					transport: signalR.HttpTransportType.WebSockets,
+				})
+				.build();
+			setConnection(hubConnection);
+		}
+		return () => {
+			if (connectionRef !== undefined) {
+				connectionRef.stop().catch((e) => console.log(e));
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [params]);
 
-  useEffect(() => {
-    const startConnection = async () => {
-      if (connectionRef) {
-        try {
-          if (connectionRef.state !== signalR.HubConnectionState.Connected) {
-            await connectionRef.start();
-          }
+	useEffect(() => {
+		const startConnection = async () => {
+			if (connectionRef) {
+				try {
+					if (connectionRef.state !== signalR.HubConnectionState.Connected) {
+						await connectionRef.stop();
+						await connectionRef.start();
+					}
 
-          setIsConnected(true);
-          connectionRef.off("ReceiveMessage");
-          connectionRef.on(
-            "ReceiveMessage",
-            // special type for WS messages since I need to know who is owner client side
-            (userId: number, message: messageWSDto) => {
-              setMessage({
-                author: message.author,
-                content: message.content,
-                createdAt: message.createdAt,
-                isOwner: userId.toString() === user.userId?.toString(),
-              });
-            }
-          );
+					setIsConnected(true);
+					connectionRef.on(
+						"ReceiveMessage",
+						// special type for WS messages since I need to know who is owner client side
+						(userId: number, message: messageWSDto) => {
+							setMessage({
+								author: message.author,
+								content: message.content,
+								createdAt: message.createdAt,
+								isOwner: userId.toString() === user.userId?.toString(),
+							});
+						},
+					);
 
-          connectionRef.onclose(() => {
-            setIsConnected(false);
-          });
-          connectionRef.onreconnected(() => {
-            if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
-          });
+					connectionRef.onclose(() => {
+						setIsConnected(false);
+					});
+					connectionRef.onreconnected(() => {
+						if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
+					});
 
-          await connectionRef.invoke("JoinGroup", params.id);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
-    startConnection();
-    return () => {
-      if (connectionRef) {
-        setIsConnected(false);
-        connectionRef.invoke("LeaveGroup", params.id);
-      }
-    };
-  }, [connectionRef, params.id, user.userId]);
+					await connectionRef.invoke("JoinGroup", params.id);
+				} catch (error) {
+					console.error(error);
+				}
+			}
+		};
+		startConnection();
+	}, [connectionRef]);
 
-  return (
-    <div className="message-body">
-      {!isConnected && message === null ? (
-        <TailSpin
-          height="40"
-          width="40"
-          color="white"
-          ariaLabel="tail-spin-loading"
-          wrapperClass="load"
-        />
-      ) : (
-        <>
-          <MessageHeader />
-          <MessageBody message={message} />
-          <MessageSend post={postMessage} />
-        </>
-      )}
-    </div>
-  );
+	return (
+		<div className="message-body">
+			{!isConnected && message === null ? (
+				<TailSpin
+					height="40"
+					width="40"
+					color="white"
+					ariaLabel="tail-spin-loading"
+					wrapperClass="load"
+				/>
+			) : (
+				<>
+					<MessageHeader />
+					<MessageBody message={message} />
+					<MessageSend post={postMessage} />
+				</>
+			)}
+		</div>
+	);
 }
 
 export default Messages;
