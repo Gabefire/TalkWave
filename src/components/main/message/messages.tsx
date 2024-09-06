@@ -53,7 +53,7 @@ function Messages() {
 					}
 
 					await connectionRef.start();
-					console.log("connected");
+					console.log("Connected");
 					setIsConnected(true);
 					connectionRef.on(
 						"ReceiveMessage",
@@ -74,6 +74,8 @@ function Messages() {
 					connectionRef.onreconnected(() => {
 						if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
 					});
+
+					await connectionRef.invoke("JoinGroup", params.id);
 				} catch (error) {
 					console.error(error);
 				}
@@ -85,7 +87,6 @@ function Messages() {
 				connectionRef &&
 				connectionRef.state !== signalR.HubConnectionState.Disconnected
 			) {
-				console.log("disconnecting");
 				connectionRef.stop();
 			}
 		};
