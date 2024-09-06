@@ -38,7 +38,6 @@ function Messages() {
 				transport: signalR.HttpTransportType.WebSockets,
 			})
 			.build();
-		console.log("should not rebuild");
 		setConnection(hubConnection);
 	}, []);
 
@@ -48,28 +47,27 @@ function Messages() {
 				try {
 					if (connectionRef.state !== signalR.HubConnectionState.Connected) {
 						await connectionRef.start();
+						setIsConnected(true);
+						connectionRef.on(
+							"ReceiveMessage",
+							// special type for WS messages since I need to know who is owner client side
+							(userId: number, message: messageWSDto) => {
+								setMessage({
+									author: message.author,
+									content: message.content,
+									createdAt: message.createdAt,
+									isOwner: userId.toString() === user.userId?.toString(),
+								});
+							},
+						);
+
+						connectionRef.onclose(() => {
+							setIsConnected(false);
+						});
+						connectionRef.onreconnected(() => {
+							if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
+						});
 					}
-
-					setIsConnected(true);
-					connectionRef.on(
-						"ReceiveMessage",
-						// special type for WS messages since I need to know who is owner client side
-						(userId: number, message: messageWSDto) => {
-							setMessage({
-								author: message.author,
-								content: message.content,
-								createdAt: message.createdAt,
-								isOwner: userId.toString() === user.userId?.toString(),
-							});
-						},
-					);
-
-					connectionRef.onclose(() => {
-						setIsConnected(false);
-					});
-					connectionRef.onreconnected(() => {
-						if (connectionRef) connectionRef.invoke("JoinGroup", params.id);
-					});
 
 					await connectionRef.invoke("JoinGroup", params.id);
 				} catch (error) {
