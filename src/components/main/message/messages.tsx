@@ -42,6 +42,7 @@ function Messages() {
 		}
 		return () => {
 			if (connectionRef !== undefined) {
+				console.log("triggered");
 				connectionRef.stop().catch((e) => console.log(e));
 			}
 		};
@@ -53,7 +54,6 @@ function Messages() {
 			if (connectionRef) {
 				try {
 					if (connectionRef.state !== signalR.HubConnectionState.Connected) {
-						await connectionRef.stop();
 						await connectionRef.start();
 					}
 
