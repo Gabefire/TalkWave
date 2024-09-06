@@ -29,25 +29,22 @@ function Messages() {
 
 	const [connectionRef, setConnection] = useState<signalR.HubConnection>();
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		if (user.token) {
-			const hubConnection = new signalR.HubConnectionBuilder()
-				.withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
-					accessTokenFactory: () => user.token as string,
-					skipNegotiation: true,
-					transport: signalR.HttpTransportType.WebSockets,
-				})
-				.build();
-			setConnection(hubConnection);
-		}
+		const hubConnection = new signalR.HubConnectionBuilder()
+			.withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
+				accessTokenFactory: () => user.token as string,
+				skipNegotiation: true,
+				transport: signalR.HttpTransportType.WebSockets,
+			})
+			.build();
+		setConnection(hubConnection);
 		return () => {
 			if (connectionRef !== undefined) {
-				console.log("triggered");
-				connectionRef.stop().catch((e) => console.log(e));
+				connectionRef.stop();
 			}
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [params]);
+	}, []);
 
 	useEffect(() => {
 		const startConnection = async () => {
@@ -85,7 +82,12 @@ function Messages() {
 			}
 		};
 		startConnection();
-	}, [connectionRef]);
+		return () => {
+			if (connectionRef !== undefined) {
+				connectionRef.invoke("LeaveGroup", params.id);
+			}
+		};
+	}, [params, connectionRef, user.userId]);
 
 	return (
 		<div className="message-body">
