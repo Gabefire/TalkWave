@@ -38,12 +38,8 @@ function Messages() {
 				transport: signalR.HttpTransportType.WebSockets,
 			})
 			.build();
+		console.log("should not rebuild");
 		setConnection(hubConnection);
-		return () => {
-			if (connectionRef !== undefined) {
-				connectionRef.stop();
-			}
-		};
 	}, []);
 
 	useEffect(() => {
@@ -83,6 +79,7 @@ function Messages() {
 		};
 		startConnection();
 		return () => {
+			console.log("test");
 			if (connectionRef !== undefined) {
 				connectionRef.invoke("LeaveGroup", params.id);
 			}
