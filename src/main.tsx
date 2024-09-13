@@ -16,29 +16,29 @@ import Welcome from "./components/main/message/welcome.tsx";
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 const router = createBrowserRouter([
-  {
-    path: "/main",
-    element: <MainRoot />,
-    children: [
-      { index: true, element: <Welcome /> },
-      { path: ":type/:id", element: <Messages /> },
-      { path: "create-group", element: <CreateGroup /> },
-    ],
-  },
-  {
-    path: "/",
-    element: <AuthRoot />,
-    children: [
-      { index: true, element: <MainPage /> },
-      { path: "login", element: <Login /> },
-      { path: "sign-up", element: <SignUp /> },
-      { path: "edit-profile", element: <EditProfile /> },
-    ],
-  },
+	{
+		path: "/main",
+		element: <MainRoot />,
+		children: [
+			{ index: true, element: <Welcome /> },
+			{ path: ":type/:id", element: <Messages /> },
+			{ path: "create-group", element: <CreateGroup /> },
+		],
+	},
+	{
+		path: "/",
+		element: <AuthRoot />,
+		children: [
+			{ index: true, element: <MainPage /> },
+			{ path: "login", element: <Login /> },
+			{ path: "sign-up", element: <SignUp /> },
+			{ path: "edit-profile", element: <EditProfile /> },
+		],
+	},
 ]);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <RouterProvider router={router} />
-  </AuthProvider>
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+	<AuthProvider>
+		<RouterProvider router={router} />
+	</AuthProvider>,
 );

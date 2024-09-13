@@ -34,11 +34,18 @@ function Messages() {
 		const hubConnection = new signalR.HubConnectionBuilder()
 			.withUrl(`${import.meta.env.VITE_WEB_SOCKET_URL}/api/Message`, {
 				accessTokenFactory: () => user.token as string,
-				skipNegotiation: true,
 				transport: signalR.HttpTransportType.WebSockets,
 			})
 			.build();
 		setConnection(hubConnection);
+		return () => {
+			if (
+				connectionRef &&
+				connectionRef.state !== signalR.HubConnectionState.Disconnected
+			) {
+				connectionRef.stop();
+			}
+		};
 	}, []);
 
 	useEffect(() => {
@@ -82,14 +89,6 @@ function Messages() {
 			}
 		};
 		startConnection();
-		return () => {
-			if (
-				connectionRef &&
-				connectionRef.state !== signalR.HubConnectionState.Disconnected
-			) {
-				connectionRef.stop();
-			}
-		};
 	}, [params, connectionRef, user.userId]);
 
 	return (
